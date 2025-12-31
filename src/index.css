@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Custom Animations */
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+@keyframes float-delayed { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+@keyframes pulse-slow { 0%, 100% { opacity: var(--pulse-opacity-start, 0.4); transform: scale(1); } 50% { opacity: var(--pulse-opacity-end, 0.6); transform: scale(1.1); } }
+@keyframes rain { 0% { background-position: 0 0; } 100% { background-position: 20px 200px; } }
+@keyframes bounce-slow { 0%, 100% { transform: translateY(-5%); } 50% { transform: translateY(0); } }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+.animate-rain { animation: rain 0.5s linear infinite; }
+.animate-bounce-slow { animation: bounce-slow 3s ease-in-out infinite; }
