@@ -17,6 +17,26 @@ const App = () => {
   const [error, setError] = useState(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(2); 
 
+  // Language Toggle Logic (EN -> AR -> MA -> EN)
+  const toggleLanguage = () => {
+    setLang(prev => {
+      if (prev === 'en') return 'ar';
+      if (prev === 'ar') return 'ma'; // Moroccan Dialect
+      return 'en';
+    });
+  };
+
+  // Roast Button Logic with Sound
+  const handleRoastClick = () => {
+    setPersonality('roast');
+    // Haptic Feedback
+    if (navigator.vibrate) navigator.vibrate(200);
+    // Sound Effect (Vine Boom)
+    const audio = new Audio('https://www.myinstants.com/media/sounds/vine-boom.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play failed - interaction required"));
+  };
+
   useEffect(() => {
     initializeAdMob();
     const timer = setTimeout(() => {
@@ -104,6 +124,7 @@ const App = () => {
   }, [location, activeLocationType, lang]);
 
   const currentMood = useMemo(() => {
+    // Pass 'ma' lang support to helper if needed, but current helper uses lang prop correctly
     if (!weatherData) return getWeatherMood(0, lang, isDarkMode, personality);
     return getWeatherMood(weatherData.daily[selectedDayIndex].code, lang, isDarkMode, personality);
   }, [weatherData, selectedDayIndex, lang, isDarkMode, personality]);
@@ -138,25 +159,23 @@ const App = () => {
   );
 
   return (
-    <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen relative overflow-hidden font-sans transition-colors duration-1000 ${currentMood.bg}`}>
+    <div dir={lang === 'en' ? 'ltr' : 'rtl'} className={`min-h-screen relative overflow-hidden font-sans transition-colors duration-1000 ${currentMood.bg}`}>
       
       <WeatherBackground type={currentMood.type} isDarkMode={isDarkMode} personality={personality} />
 
       <div className="relative z-20 px-6 pt-6 flex items-center justify-between max-w-md mx-auto">
          <div className="flex gap-2">
            <button 
-             onClick={() => setLang(prev => prev === 'en' ? 'ar' : 'en')}
-             className={`p-2 rounded-full backdrop-blur-md shadow-sm border transition-all ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-800'}`}
+             onClick={toggleLanguage}
+             className={`px-3 py-2 rounded-full backdrop-blur-md shadow-sm border transition-all flex items-center gap-1 ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-800'}`}
              title="Switch Language"
            >
-              <Globe size={18} />
+              <Globe size={16} />
+              <span className="text-xs font-bold uppercase">{lang}</span>
            </button>
            
            <button 
-             onClick={() => {
-                setPersonality('roast');
-                if (navigator.vibrate) navigator.vibrate(50);
-             }}
+             onClick={handleRoastClick}
              className="p-2 rounded-full backdrop-blur-md shadow-sm border transition-all bg-red-600 text-white border-red-500 hover:scale-110 hover:rotate-12 active:scale-95"
              title="Roast My Weather 🔥"
            >
