@@ -46,6 +46,14 @@ export const getThemeColors = (type, isDarkMode, isRoastMode) => {
   }
 };
 
+// ✅ FIX 1: Convert wind degrees to compass direction label
+export const degreesToCompass = (degrees) => {
+  if (degrees === null || degrees === undefined || degrees === '-') return '-';
+  const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(degrees / 45) % 8;
+  return dirs[index];
+};
+
 export const getWeatherMood = (code, lang, isDarkMode, personality) => {
   const t = TRANSLATIONS[lang].moods;
   let moodData = {};
@@ -61,7 +69,14 @@ export const getWeatherMood = (code, lang, isDarkMode, personality) => {
   const colors = getThemeColors(moodData.type, isDarkMode, personality === 'roast');
   const personalityContent = moodData[personality] || moodData.sarcastic;
   
-  return { ...moodData, ...colors, quote: personalityContent.quote, advice: personalityContent.advice };
+  // ✅ FIX 1: excuse is now included in the return
+  return {
+    ...moodData,
+    ...colors,
+    quote: personalityContent.quote,
+    advice: personalityContent.advice,
+    excuse: personalityContent.excuse,
+  };
 };
 
 export const formatDate = (isoDate, lang) => {
