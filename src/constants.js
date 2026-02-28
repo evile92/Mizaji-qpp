@@ -8,6 +8,7 @@ export const TRANSLATIONS = {
     retry: 'Retry',
     oops: 'Oops.',
     timeline: 'TIMELINE',
+    hourly: 'HOURLY',
     feelsLike: 'Feels Like',
     wind: 'Wind',
     humidity: 'Humidity',
@@ -22,6 +23,7 @@ export const TRANSLATIONS = {
     fetchError: 'Failed to fetch weather data.',
     excuseBtn: 'Copy Excuse 📋',
     excuseCopied: 'Copied!',
+    shareBtn: 'Share Card',
     memory: {
       warmer: "Warmer than yesterday.",
       colder: "Colder than yesterday.",
@@ -87,6 +89,7 @@ export const TRANSLATIONS = {
     retry: 'أعد المحاولة',
     oops: 'عفواً',
     timeline: 'الجدول الزمني',
+    hourly: 'بالساعة',
     feelsLike: 'الإحساس الفعلي',
     wind: 'الرياح',
     humidity: 'الرطوبة',
@@ -101,6 +104,7 @@ export const TRANSLATIONS = {
     fetchError: 'فشل جلب بيانات الطقس.',
     excuseBtn: 'نسخ عذر للغياب 📋',
     excuseCopied: 'تم النسخ!',
+    shareBtn: 'مشاركة البطاقة',
     memory: {
       warmer: "أدفأ من طقس الأمس.",
       colder: "أبرد من طقس الأمس.",
@@ -166,6 +170,7 @@ export const TRANSLATIONS = {
     retry: 'عاود جرب',
     oops: 'ويلي!',
     timeline: 'الوقت',
+    hourly: 'بالساعة',
     feelsLike: 'الحرارة ديال بصح',
     wind: 'الشرقي / الريح',
     humidity: 'الرطوبة',
@@ -180,6 +185,7 @@ export const TRANSLATIONS = {
     fetchError: 'الكونيكسيون ميتة ولا السيرفر طاح.',
     excuseBtn: 'عطيني شي سبة 📋',
     excuseCopied: 'صافي ناضي!',
+    shareBtn: 'شارك الكارطة',
     memory: {
       warmer: "سخن من البارح.",
       colder: "بارد على البارح.",
