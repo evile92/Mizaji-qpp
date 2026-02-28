@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapPin, RefreshCw, Calendar, Thermometer, Wind, Droplets, Navigation, Globe, Flame, CloudLightning, Sun, Moon, Map as MapIcon } from 'lucide-react';
 import { TRANSLATIONS } from './constants';
-import { initializeAdMob, showBannerAd, getWeatherMood } from './utils';
+import { initializeAdMob, showBannerAd, getWeatherMood, degreesToCompass } from './utils';
 import { WeatherBackground, PersonalitySlider, MapModal, DailyCard, DetailMetric } from './components/WeatherUI';
 import { MoodPersona } from './components/MoodPersona';
 
@@ -45,9 +45,14 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ FIX 2: Location effect now updates name when language changes
   useEffect(() => {
-     setLocation(prev => ({ ...prev, name: TRANSLATIONS[lang].detecting }));
-  }, []);
+    setLocation(prev => ({
+      ...prev,
+      // Only update name if it was previously a translated label (not a custom name)
+      name: prev.lat ? TRANSLATIONS[lang].yourLocation : TRANSLATIONS[lang].detecting
+    }));
+  }, [lang]);
 
   useEffect(() => {
     const setDefaultLocation = () => {
@@ -71,7 +76,8 @@ const App = () => {
     } else {
       setDefaultLocation();
     }
-  }, [lang]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ Run once on mount only - lang effect above handles name translation
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -84,7 +90,8 @@ const App = () => {
         const lat = activeLocationType === 'current' ? location.lat : location.lat + 0.05;
         const lon = activeLocationType === 'current' ? location.lon : location.lon + 0.05;
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&past_days=2&forecast_days=2&timezone=auto`;
+        // ✅ FIX 3: Added winddirection_10m to get real wind direction
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,winddirection_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&past_days=2&forecast_days=2&timezone=auto`;
         
         const response = await fetch(url);
         if (!response.ok) throw new Error("API Error");
@@ -104,6 +111,8 @@ const App = () => {
             temp: data.current.temperature_2m,
             humidity: data.current.relative_humidity_2m,
             wind: data.current.wind_speed_10m,
+            // ✅ FIX 3: Store real wind direction degrees
+            windDirection: data.current.winddirection_10m,
             code: data.current.weather_code
           },
           daily: dailyProcessed,
@@ -124,7 +133,6 @@ const App = () => {
   }, [location, activeLocationType, lang]);
 
   const currentMood = useMemo(() => {
-    // Pass 'ma' lang support to helper if needed, but current helper uses lang prop correctly
     if (!weatherData) return getWeatherMood(0, lang, isDarkMode, personality);
     return getWeatherMood(weatherData.daily[selectedDayIndex].code, lang, isDarkMode, personality);
   }, [weatherData, selectedDayIndex, lang, isDarkMode, personality]);
@@ -140,6 +148,8 @@ const App = () => {
       yesterdayTemp: yesterdayTemp,
       humidity: isToday ? weatherData.current.humidity : '-',
       wind: isToday ? weatherData.current.wind : '-',
+      // ✅ FIX 3: Pass real wind direction, convert degrees to compass label
+      windDirection: isToday ? degreesToCompass(weatherData.current.windDirection) : '-',
       conditionCode: day.code,
       date: day.time
     };
@@ -243,9 +253,10 @@ const App = () => {
               
               <div className="grid grid-cols-2 gap-4 w-full mt-6">
                  <DetailMetric icon={Thermometer} label={TRANSLATIONS[lang].feelsLike} value={Math.round(displayData.temp)} unit="°C" delay={100} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                 <DetailMetric icon={Wind} label={TRANSLATIONS[lang].wind} value={displayData.wind} unit="km/h" delay={200} isDarkMode={isDarkMode} lang={lang} personality={personality} />
+                 <DetailMetric icon={Wind} label={TRANSLATIONS[lang].wind} value={displayData.wind !== '-' ? Math.round(displayData.wind) : '-'} unit={displayData.wind !== '-' ? "km/h" : ""} delay={200} isDarkMode={isDarkMode} lang={lang} personality={personality} />
                  <DetailMetric icon={Droplets} label={TRANSLATIONS[lang].humidity} value={displayData.humidity} unit="%" delay={300} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                 <DetailMetric icon={Navigation} label={TRANSLATIONS[lang].direction} value={currentMood.type === 'sunny' ? 'N' : 'SW'} unit="" delay={400} isDarkMode={isDarkMode} lang={lang} personality={personality} />
+                 {/* ✅ FIX 3: Real wind direction from API */}
+                 <DetailMetric icon={Navigation} label={TRANSLATIONS[lang].direction} value={displayData.windDirection} unit="" delay={400} isDarkMode={isDarkMode} lang={lang} personality={personality} />
               </div>
             </div>
 
