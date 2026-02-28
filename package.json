@@ -1,7 +1,7 @@
 {
   "name": "mizaji-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "lucide-react": "^0.294.0",
+    "html2canvas": "^1.4.1",
     "@capacitor-community/admob": "^5.0.0"
   },
   "devDependencies": {
