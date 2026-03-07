@@ -95,7 +95,11 @@ export const DailyCard = ({ day, mood, isSelected, onClick, lang, isDarkMode, pe
     <button 
       onClick={onClick}
       dir={isAr ? 'rtl' : 'ltr'}
-      className={`relative flex flex-col items-center justify-between p-4 rounded-2xl transition-all duration-300 ${isSelected ? `${isRoast ? 'bg-red-900/80 ring-red-500' : (isDarkMode ? 'bg-slate-700 ring-slate-500' : 'bg-white ring-' + mood.text.split('-')[1] + '-300')} shadow-lg scale-105 ring-2` : `${isDarkMode ? 'bg-slate-800/40 hover:bg-slate-800/60' : 'bg-white/40 hover:bg-white/60'} hover:scale-105 border border-white/10`}`}
+      className={`relative flex flex-col items-center justify-between p-4 rounded-2xl transition-all duration-300 ${
+        isSelected 
+          ? `${isRoast ? 'bg-red-900/80 ring-red-500' : (isDarkMode ? 'bg-slate-700 ring-slate-500' : 'bg-white ring-white/50')} shadow-lg scale-105 ring-2` 
+          : `${isDarkMode ? 'bg-slate-800/40 hover:bg-slate-800/60' : 'bg-white/40 hover:bg-white/60'} hover:scale-105 border border-white/10`
+      }`}
     >
       <span className={`text-xs font-bold uppercase tracking-wider opacity-70 mb-2 ${isRoast ? 'text-red-300' : (isDarkMode ? 'text-slate-300' : 'text-slate-600')}`}>
         {formatDate(day.time, lang)}
