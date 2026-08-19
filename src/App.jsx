@@ -1,268 +1,324 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { MapPin, RefreshCw, Calendar, Thermometer, Wind, Droplets, Navigation, Globe, Flame, CloudLightning, Sun, Moon, Map as MapIcon, Share2 } from 'lucide-react';
-import { TRANSLATIONS } from './constants';
-import { initializeAdMob, showBannerAd, getWeatherMood, degreesToCompass } from './utils';
-import { WeatherBackground, PersonalitySlider, MapModal, DailyCard, DetailMetric } from './components/WeatherUI';
-import { MoodPersona } from './components/MoodPersona';
-import { HourlyForecast } from './components/HourlyForecast';
-import { ShareCard } from './components/ShareCard';
-import { PrayerTimesPage } from './components/PrayerTimes';
+import React, { useState, useEffect, useCallback } from 'react';
+import { CloudLightning } from 'lucide-react';
+import { TRANSLATIONS } from './constants/translations';
+import { useLocation } from './hooks/useLocation';
+import { useWeather } from './hooks/useWeather';
+import { usePrayerTimes } from './hooks/usePrayerTimes';
+import { useSoundEffects } from './hooks/useSoundEffects';
+
+// Components
+import { Header } from './components/common/Header';
+import { BottomNav } from './components/common/BottomNav';
+import { WeatherAtmosphere } from './components/weather/WeatherAtmosphere';
+import { HeroWeather } from './components/weather/HeroWeather';
+import { WeatherMetricsGrid } from './components/weather/WeatherMetricsGrid';
+import { HourlyForecastList } from './components/weather/HourlyForecastList';
+import { DailyForecastGrid } from './components/weather/DailyForecastGrid';
+import { PrayerTimesView } from './components/prayer/PrayerTimesView';
+import { LocationSearchModal } from './components/location/LocationSearchModal';
+import { WeatherMapModal } from './components/map/WeatherMapModal';
+import { ShareCardModal } from './components/share/ShareCardModal';
 
 const App = () => {
-  const [lang, setLang] = useState('en');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showMap, setShowMap] = useState(false);
-  const [showShare, setShowShare] = useState(false);
+  // ── Global Preferences ───────────────────────────────────────────────────
+  const [lang, setLang] = useState(() => {
+    return localStorage.getItem('mizaji_lang') || 'ar';
+  });
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('mizaji_theme');
+    if (saved) return saved === 'dark';
+    return true; // Default to sleek dark mode
+  });
+
+  const [personality, setPersonality] = useState('sarcastic'); // 'calm' | 'sarcastic' | 'roast'
   const [activeTab, setActiveTab] = useState('weather'); // 'weather' | 'prayer'
-  const [personality, setPersonality] = useState('sarcastic');
-  const [location, setLocation] = useState({ lat: null, lon: null, name: '' });
-  const [activeLocationType, setActiveLocationType] = useState('current');
-  const [weatherData, setWeatherData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedDayIndex, setSelectedDayIndex] = useState(2);
 
-  const toggleLanguage = () => {
-    setLang(prev => prev === 'en' ? 'ar' : prev === 'ar' ? 'ma' : 'en');
-  };
+  // Modals
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
-  const handleRoastClick = () => {
-    setPersonality('roast');
-    if (navigator.vibrate) navigator.vibrate(200);
-    const audio = new Audio('https://www.myinstants.com/media/sounds/vine-boom.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(() => {});
-  };
+  // Sound Engine
+  const { playRoastSound, playTapSound } = useSoundEffects();
 
+  // Location Hook
+  const {
+    location,
+    displayName: locationDisplayName,
+    isGpsActive,
+    detectGpsLocation,
+    selectCity,
+    searchCities,
+    searchResults,
+    isSearching,
+    popularCities,
+  } = useLocation(lang);
+
+  // Weather Hook
+  const {
+    weatherData,
+    activeDayData,
+    currentMood,
+    selectedDayHourly,
+    selectedDayIndex,
+    setSelectedDayIndex,
+    loading: weatherLoading,
+    error: weatherError,
+    refreshWeather,
+    shuffleRoastQuote,
+  } = useWeather(location.lat, location.lon, lang, isDarkMode, personality);
+
+  // Prayer Times Hook
+  const {
+    prayers,
+    hijri,
+    nextPrayerInfo,
+    qiblaAngle,
+    loading: prayerLoading,
+    error: prayerError,
+    calcMethod,
+    setCalcMethod,
+    refreshPrayers,
+  } = usePrayerTimes(location.lat, location.lon, lang);
+
+  // Sync Dark Mode class on <html>
   useEffect(() => {
-    initializeAdMob();
-    const timer = setTimeout(() => showBannerAd(), 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('mizaji_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('mizaji_theme', 'light');
+    }
+  }, [isDarkMode]);
 
+  // Sync Language
   useEffect(() => {
-    setLocation(prev => ({
-      ...prev,
-      name: prev.lat ? TRANSLATIONS[lang].yourLocation : TRANSLATIONS[lang].detecting
-    }));
+    localStorage.setItem('mizaji_lang', lang);
   }, [lang]);
 
-  useEffect(() => {
-    const setDefault = () => setLocation({ lat: 35.57, lon: -5.37, name: 'Tetouan (Default)' });
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude, name: TRANSLATIONS[lang].yourLocation }),
-        () => setDefault()
-      );
+  // Language toggle cycle (AR -> MA -> EN -> AR)
+  const handleToggleLang = useCallback(() => {
+    playTapSound();
+    setLang((prev) => (prev === 'ar' ? 'ma' : prev === 'ma' ? 'en' : 'ar'));
+  }, [playTapSound]);
+
+  // Dark mode toggle
+  const handleToggleDarkMode = useCallback(() => {
+    playTapSound();
+    setIsDarkMode((prev) => !prev);
+  }, [playTapSound]);
+
+  // Roast Mode Trigger
+  const handleTriggerRoast = useCallback(() => {
+    playRoastSound();
+    setPersonality('roast');
+    shuffleRoastQuote();
+  }, [playRoastSound, shuffleRoastQuote]);
+
+  // Personality Change
+  const handleChangePersonality = useCallback((newP) => {
+    if (newP === 'roast') {
+      playRoastSound();
     } else {
-      setDefault();
+      playTapSound();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setPersonality(newP);
+  }, [playRoastSound, playTapSound]);
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      if (!location.lat) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const lat = activeLocationType === 'current' ? location.lat : location.lat + 0.05;
-        const lon = activeLocationType === 'current' ? location.lon : location.lon + 0.05;
+  // Refresh All Data
+  const handleRefreshAll = useCallback(() => {
+    playTapSound();
+    refreshWeather();
+    refreshPrayers();
+  }, [playTapSound, refreshWeather, refreshPrayers]);
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
-          + `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,winddirection_10m`
-          + `&hourly=temperature_2m,weather_code,precipitation_probability`
-          + `&daily=weather_code,temperature_2m_max,temperature_2m_min`
-          + `&past_days=2&forecast_days=2&timezone=auto`;
+  const isRtl = lang === 'ar' || lang === 'ma';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('API Error');
-        const data = await res.json();
-        if (data.error) throw new Error(data.reason);
-
-        const daily = data.daily.time.map((time, i) => ({
-          time, code: data.daily.weather_code[i],
-          tempMax: data.daily.temperature_2m_max[i],
-          tempMin: data.daily.temperature_2m_min[i],
-        }));
-
-        const todayStart = 48;
-        const hourly = data.hourly.time.slice(todayStart, todayStart + 24).map((time, i) => {
-          const abs = todayStart + i;
-          return { time, hour: new Date(time).getHours(), temp: data.hourly.temperature_2m[abs], code: data.hourly.weather_code[abs], precip: data.hourly.precipitation_probability[abs] ?? 0 };
-        });
-
-        setWeatherData({
-          current: { temp: data.current.temperature_2m, humidity: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, windDirection: data.current.winddirection_10m, code: data.current.weather_code },
-          daily, hourly, timezone: data.timezone,
-        });
-        setSelectedDayIndex(2);
-      } catch (err) {
-        setError(TRANSLATIONS[lang].fetchError);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWeather();
-  }, [location, activeLocationType, lang]);
-
-  const currentMood = useMemo(() => {
-    if (!weatherData) return getWeatherMood(0, lang, isDarkMode, personality);
-    return getWeatherMood(weatherData.daily[selectedDayIndex].code, lang, isDarkMode, personality);
-  }, [weatherData, selectedDayIndex, lang, isDarkMode, personality]);
-
-  const displayData = useMemo(() => {
-    if (!weatherData) return null;
-    const day = weatherData.daily[selectedDayIndex];
-    const isToday = selectedDayIndex === 2;
-    return {
-      temp: isToday ? weatherData.current.temp : day.tempMax,
-      yesterdayTemp: weatherData.daily[1]?.tempMax,
-      humidity: isToday ? weatherData.current.humidity : '-',
-      wind: isToday ? weatherData.current.wind : '-',
-      windDirection: isToday ? degreesToCompass(weatherData.current.windDirection) : '-',
-      conditionCode: day.code, date: day.time,
-    };
-  }, [weatherData, selectedDayIndex]);
-
-  const tabLabels = { weather: { en: 'Weather', ar: 'الطقس', ma: 'الجو' }, prayer: { en: 'Prayer', ar: 'الصلاة', ma: 'الصلاة' } };
-
-  if (error) return (
-    <div className={`flex items-center justify-center h-screen p-8 text-center ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-800'}`}>
-      <div>
-        <CloudLightning className="w-16 h-16 mx-auto mb-4 opacity-50" />
-        <h1 className="text-2xl font-bold mb-2">{TRANSLATIONS[lang].oops}</h1>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()} className={`mt-4 px-6 py-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-800 text-white'}`}>
-          {TRANSLATIONS[lang].retry}
-        </button>
+  // Critical Error Screen
+  if (weatherError && !weatherData) {
+    return (
+      <div 
+        dir={isRtl ? 'rtl' : 'ltr'} 
+        className={`flex items-center justify-center min-h-screen p-6 text-center ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}
+      >
+        <div className="max-w-sm flex flex-col items-center">
+          <CloudLightning className="w-16 h-16 mb-4 text-rose-500 animate-bounce-slow" />
+          <h1 className="text-xl font-black mb-2">{t.oops}</h1>
+          <p className="text-xs font-semibold opacity-75 mb-5">{weatherError}</p>
+          <button 
+            onClick={handleRefreshAll}
+            className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-lg transition-transform active:scale-95"
+          >
+            {t.retry}
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div dir={lang === 'en' ? 'ltr' : 'rtl'} className={`min-h-screen relative overflow-hidden font-sans transition-colors duration-1000 ${currentMood.bg}`}>
-      <WeatherBackground type={currentMood.type} isDarkMode={isDarkMode} personality={personality} />
+    <div
+      dir={isRtl ? 'rtl' : 'ltr'}
+      className={`min-h-screen relative overflow-x-hidden font-sans transition-colors duration-700 select-none ${currentMood.bg}`}
+    >
+      {/* Dynamic Animated Background Atmosphere */}
+      <WeatherAtmosphere 
+        type={currentMood.type} 
+        isDarkMode={isDarkMode} 
+        personality={personality} 
+      />
 
-      {/* Top bar */}
-      <div className="relative z-20 px-6 pt-6 flex items-center justify-between max-w-md mx-auto">
-        <div className="flex gap-2">
-          <button onClick={toggleLanguage} className={`px-3 py-2 rounded-full backdrop-blur-md shadow-sm border transition-all flex items-center gap-1 ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-800'}`}>
-            <Globe size={16} /><span className="text-xs font-bold uppercase">{lang}</span>
-          </button>
-          <button onClick={handleRoastClick} className="p-2 rounded-full backdrop-blur-md shadow-sm border bg-red-600 text-white border-red-500 hover:scale-110 hover:rotate-12 active:scale-95 transition-all">
-            <Flame size={18} />
-          </button>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowShare(true)} className={`p-2 rounded-full backdrop-blur-md shadow-sm border transition-all ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-800'}`}>
-            <Share2 size={18} />
-          </button>
-          <button onClick={() => setShowMap(true)} className={`p-2 rounded-full backdrop-blur-md shadow-sm border transition-all ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-800'}`}>
-            <MapIcon size={18} />
-          </button>
-          <button onClick={() => setIsDarkMode(prev => !prev)} className={`p-2 rounded-full backdrop-blur-md shadow-sm border transition-all ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-yellow-400' : 'bg-white/40 border-white/20 text-slate-800'}`}>
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-        </div>
-      </div>
+      {/* Top Header Bar */}
+      <Header
+        lang={lang}
+        onToggleLang={handleToggleLang}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        personality={personality}
+        onTriggerRoast={handleTriggerRoast}
+        locationDisplayName={locationDisplayName}
+        isGpsActive={isGpsActive}
+        onOpenSearch={() => setShowSearchModal(true)}
+        onOpenMap={() => setShowMapModal(true)}
+        onOpenShare={() => setShowShareModal(true)}
+        onRefresh={handleRefreshAll}
+        isLoading={weatherLoading || prayerLoading}
+      />
 
-      {/* Weather Tab Content */}
-      {activeTab === 'weather' && (
-        <div className="relative z-10 max-w-md mx-auto min-h-screen flex flex-col p-6 pt-4 pb-28">
-          <header className="flex items-center justify-between mb-4">
-            <div className={`flex items-center gap-2 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border ${isDarkMode ? 'bg-slate-800/40 border-slate-700 text-white' : 'bg-white/40 border-white/20 text-slate-700'}`}>
-              <MapPin size={16} className={personality === 'roast' ? 'text-red-500' : currentMood.text} />
-              <span className="text-sm font-bold">{activeLocationType === 'current' ? (location.name || TRANSLATIONS[lang].yourLocation) : TRANSLATIONS[lang].nearby}</span>
-            </div>
-            <button onClick={() => setActiveLocationType(prev => prev === 'current' ? 'nearby' : 'current')} className={`p-2 rounded-full transition-colors backdrop-blur-md shadow-sm border ${isDarkMode ? 'bg-slate-800/40 border-slate-700 hover:bg-slate-700' : 'bg-white/40 border-white/20 hover:bg-white/60'}`}>
-              <RefreshCw size={18} className={`transition-transform duration-500 ${isDarkMode ? 'text-white' : 'text-slate-800'} ${loading ? 'animate-spin' : ''}`} />
-            </button>
-          </header>
-
-          <PersonalitySlider personality={personality} setPersonality={setPersonality} lang={lang} isDarkMode={isDarkMode} />
-
-          {loading && !weatherData && (
-            <div className="flex-1 flex flex-col items-center justify-center animate-pulse">
-              <div className={`w-32 h-32 rounded-full mb-8 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`}></div>
-              <div className={`w-48 h-8 rounded mb-4 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`}></div>
-              <p className={isDarkMode ? 'text-slate-500' : 'text-slate-400'}>{TRANSLATIONS[lang].loading}</p>
-            </div>
-          )}
-
-          {!loading && weatherData && displayData && (
-            <>
-              <div className="flex-1 flex flex-col items-center justify-center transition-all duration-500">
-                <MoodPersona mood={currentMood} temp={displayData.temp} yesterdayTemp={displayData.yesterdayTemp} isDarkMode={isDarkMode} personality={personality} lang={lang} />
-                <div className="grid grid-cols-2 gap-4 w-full mt-6">
-                  <DetailMetric icon={Thermometer} label={TRANSLATIONS[lang].feelsLike} value={Math.round(displayData.temp)} unit="°C" delay={100} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                  <DetailMetric icon={Wind} label={TRANSLATIONS[lang].wind} value={displayData.wind !== '-' ? Math.round(displayData.wind) : '-'} unit={displayData.wind !== '-' ? 'km/h' : ''} delay={200} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                  <DetailMetric icon={Droplets} label={TRANSLATIONS[lang].humidity} value={displayData.humidity} unit="%" delay={300} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                  <DetailMetric icon={Navigation} label={TRANSLATIONS[lang].direction} value={displayData.windDirection} unit="" delay={400} isDarkMode={isDarkMode} lang={lang} personality={personality} />
-                </div>
+      {/* Main Tab Content */}
+      <main className="relative z-10 w-full max-w-lg mx-auto pb-24">
+        {activeTab === 'weather' && (
+          <div className="flex flex-col items-center px-4 animate-in fade-in duration-300">
+            {/* Loading Skeleton if no data yet */}
+            {weatherLoading && !activeDayData ? (
+              <div className="w-full flex flex-col items-center justify-center py-20 animate-pulse">
+                <div className={`w-32 h-32 rounded-3xl mb-6 ${isDarkMode ? 'bg-slate-800/80' : 'bg-slate-200'}`} />
+                <div className={`w-44 h-12 rounded-2xl mb-4 ${isDarkMode ? 'bg-slate-800/80' : 'bg-slate-200'}`} />
+                <div className={`w-64 h-6 rounded-xl ${isDarkMode ? 'bg-slate-800/80' : 'bg-slate-200'}`} />
               </div>
+            ) : activeDayData ? (
+              <>
+                {/* Hero Weather Section */}
+                <HeroWeather
+                  mood={currentMood}
+                  activeData={activeDayData}
+                  personality={personality}
+                  onChangePersonality={handleChangePersonality}
+                  onShuffleRoast={shuffleRoastQuote}
+                  lang={lang}
+                  isDarkMode={isDarkMode}
+                  onTapEffect={playTapSound}
+                />
 
-              {selectedDayIndex === 2 && <HourlyForecast hourlyData={weatherData.hourly} isDarkMode={isDarkMode} personality={personality} lang={lang} />}
+                {/* 24-Hour Hourly Forecast for Selected Day */}
+                <HourlyForecastList
+                  hourlyData={selectedDayHourly}
+                  isToday={activeDayData.isToday}
+                  lang={lang}
+                  isDarkMode={isDarkMode}
+                  personality={personality}
+                />
 
-              <div className="mt-6 mb-4">
-                <div className="flex items-center gap-2 mb-4 opacity-60 px-1">
-                  <Calendar size={14} className={isDarkMode ? 'text-white' : 'text-slate-800'} />
-                  <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{TRANSLATIONS[lang].timeline}</span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {weatherData.daily.map((day, idx) => {
-                    const dayMood = getWeatherMood(day.code, lang, isDarkMode, personality);
-                    return <DailyCard key={day.time} day={day} mood={dayMood} isSelected={selectedDayIndex === idx} onClick={() => setSelectedDayIndex(idx)} lang={lang} isDarkMode={isDarkMode} personality={personality} />;
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+                {/* 7-Day Timeline Forecast Grid */}
+                {weatherData?.daily && (
+                  <DailyForecastGrid
+                    dailyData={weatherData.daily}
+                    selectedDayIndex={selectedDayIndex}
+                    onSelectDay={(idx) => {
+                      playTapSound();
+                      setSelectedDayIndex(idx);
+                    }}
+                    lang={lang}
+                    isDarkMode={isDarkMode}
+                    personality={personality}
+                  />
+                )}
 
-      {/* Prayer Times Tab Content */}
-      {activeTab === 'prayer' && (
-        <div className="relative z-10">
-          <PrayerTimesPage
-            lat={location.lat}
-            lon={location.lon}
-            locationName={location.name}
+                {/* Detailed 6-Card Metrics Grid */}
+                <WeatherMetricsGrid
+                  activeData={activeDayData}
+                  lang={lang}
+                  isDarkMode={isDarkMode}
+                  personality={personality}
+                />
+              </>
+            ) : null}
+          </div>
+        )}
+
+        {/* Prayer Times Tab Content */}
+        {activeTab === 'prayer' && (
+          <PrayerTimesView
+            prayers={prayers}
+            hijri={hijri}
+            nextPrayerInfo={nextPrayerInfo}
+            qiblaAngle={qiblaAngle}
+            locationName={locationDisplayName}
+            loading={prayerLoading}
+            error={prayerError}
+            calcMethod={calcMethod}
+            onChangeCalcMethod={setCalcMethod}
+            onRefresh={refreshPrayers}
             lang={lang}
             isDarkMode={isDarkMode}
           />
-        </div>
-      )}
+        )}
+      </main>
 
-      {/* ── Bottom Nav ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 flex justify-center pb-5 px-6">
-        <div className={`flex items-center gap-1 p-1.5 rounded-3xl backdrop-blur-xl shadow-2xl border ${isDarkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-white/85 border-white/60'}`}>
+      {/* Floating Bottom Navigation Bar */}
+      <BottomNav
+        activeTab={activeTab}
+        onChangeTab={(tab) => {
+          playTapSound();
+          setActiveTab(tab);
+        }}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        personality={personality}
+      />
 
-          <button
-            onClick={() => setActiveTab('weather')}
-            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all duration-300 ${activeTab === 'weather' ? (isDarkMode ? 'bg-slate-700 text-white shadow-lg' : 'bg-slate-800 text-white shadow-lg') : (isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600')}`}
-          >
-            <Sun size={18} />
-            <span className="text-xs font-bold">{tabLabels.weather[lang]}</span>
-          </button>
+      {/* City Search Modal */}
+      <LocationSearchModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        onSelectCity={(city) => {
+          selectCity(city);
+          playTapSound();
+        }}
+        onUseGps={detectGpsLocation}
+        onSearch={searchCities}
+        searchResults={searchResults}
+        isSearching={isSearching}
+        popularCities={popularCities}
+        lang={lang}
+        isDarkMode={isDarkMode}
+      />
 
-          <button
-            onClick={() => setActiveTab('prayer')}
-            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all duration-300 ${activeTab === 'prayer' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : (isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600')}`}
-          >
-            <Moon size={18} />
-            <span className="text-xs font-bold">{tabLabels.prayer[lang]}</span>
-          </button>
+      {/* Radar Map Modal */}
+      <WeatherMapModal
+        isOpen={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        lat={location.lat}
+        lon={location.lon}
+        locationName={locationDisplayName}
+        lang={lang}
+        isDarkMode={isDarkMode}
+      />
 
-        </div>
-      </div>
-
-      {/* Modals */}
-      <MapModal isOpen={showMap} onClose={() => setShowMap(false)} lat={activeLocationType === 'current' ? location.lat : location.lat + 0.05} lon={activeLocationType === 'current' ? location.lon : location.lon + 0.05} title={TRANSLATIONS[lang].mapTitle} isDarkMode={isDarkMode} />
-
-      {showShare && displayData && (
-        <ShareCard mood={currentMood} temp={displayData.temp} humidity={displayData.humidity} wind={displayData.wind} location={location.name} quote={currentMood.quote} lang={lang} personality={personality} onClose={() => setShowShare(false)} />
-      )}
+      {/* Share Card Modal */}
+      <ShareCardModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        mood={currentMood}
+        activeData={activeDayData}
+        locationName={locationDisplayName}
+        lang={lang}
+        personality={personality}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 };
