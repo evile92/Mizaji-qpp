@@ -1,11 +1,11 @@
 {
   "name": "Mizaji - Weather Shade",
   "short_name": "Mizaji",
-  "description": "Your sarcastic weather companion",
+  "description": "Your sarcastic weather companion & prayer hub",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#f97316",
+  "background_color": "#070a13",
+  "theme_color": "#070a13",
   "orientation": "portrait",
   "icons": [
     {
@@ -22,6 +22,6 @@
     }
   ],
   "categories": ["weather", "utilities"],
-  "lang": "en",
+  "lang": "ar",
   "screenshots": []
 }

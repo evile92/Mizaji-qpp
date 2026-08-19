@@ -82,16 +82,24 @@ const App = () => {
     refreshPrayers,
   } = usePrayerTimes(location.lat, location.lon, lang);
 
-  // Sync Dark Mode class on <html>
+  // Sync Dark Mode class on <html> & <meta name="theme-color">
   useEffect(() => {
+    const metaTheme = document.getElementById('theme-color-meta') || document.querySelector('meta[name="theme-color"]');
+    
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('mizaji_theme', 'dark');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', personality === 'roast' ? '#180404' : '#070a13');
+      }
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('mizaji_theme', 'light');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', personality === 'roast' ? '#180404' : '#f8fafc');
+      }
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, personality]);
 
   // Sync Language
   useEffect(() => {
@@ -162,7 +170,7 @@ const App = () => {
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className={`min-h-screen relative overflow-x-hidden font-sans transition-colors duration-700 select-none ${currentMood.bg}`}
+      className={`min-h-screen relative overflow-x-hidden font-sans transition-colors duration-700 select-none ${currentMood.bg} ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}
     >
       {/* Dynamic Animated Background Atmosphere */}
       <WeatherAtmosphere 

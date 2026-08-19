@@ -140,7 +140,7 @@ export const LocationSearchModal = ({
             </div>
           ) : (
             <div>
-              <span className="text-[11px] font-bold opacity-50 px-1 block mb-2">
+              <span className={`text-[11px] font-bold px-1 block mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                 {t.popularCities}
               </span>
               <div className="grid grid-cols-2 gap-2">
@@ -154,17 +154,17 @@ export const LocationSearchModal = ({
                     className={`
                       p-3 rounded-2xl flex items-center gap-2.5 transition-all text-left
                       ${isDarkMode 
-                        ? 'bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60' 
+                        ? 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80' 
                         : 'bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200'
                       }
                     `}
                   >
                     <MapPin size={14} className="text-amber-500 flex-shrink-0" />
                     <div className="truncate">
-                      <p className="text-xs font-bold truncate">
+                      <p className={`text-xs font-extrabold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                         {lang === 'ar' ? c.nameAr : lang === 'ma' ? c.nameMa : c.name}
                       </p>
-                      <p className="text-[10px] opacity-50 truncate">
+                      <p className={`text-[10px] font-medium truncate ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                         {lang === 'en' ? c.country : c.countryAr}
                       </p>
                     </div>

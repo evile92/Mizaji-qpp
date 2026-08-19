@@ -158,22 +158,22 @@ export const HeroWeather = ({
         </div>
 
         {/* High / Low Range & Feels Like */}
-        <div className="flex items-center gap-3 mt-2 text-xs font-bold opacity-75">
+        <div className={`flex items-center gap-3 mt-2 text-xs font-extrabold ${isRoast ? 'text-red-200' : isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>
           <div className="flex items-center gap-0.5">
-            <ArrowUp size={12} className="text-rose-500" />
+            <ArrowUp size={13} className="text-rose-500 font-black" />
             <span>{Math.round(activeData.tempMax)}°</span>
           </div>
           <div className="flex items-center gap-0.5">
-            <ArrowDown size={12} className="text-sky-500" />
+            <ArrowDown size={13} className="text-sky-400 font-black" />
             <span>{Math.round(activeData.tempMin)}°</span>
           </div>
           <span className="opacity-40">•</span>
-          <span>{t.feelsLike}: {Math.round(activeData.feelsLike)}°</span>
+          <span className="font-semibold">{t.feelsLike}: {Math.round(activeData.feelsLike)}°</span>
         </div>
 
         {/* Memory comparison line */}
         {memoryMessage && (
-          <p className={`mt-2 text-xs font-semibold text-center px-4 max-w-sm ${isRoast ? 'text-red-400' : (isDarkMode ? 'text-slate-400' : 'text-slate-600')}`}>
+          <p className={`mt-2 text-xs font-semibold text-center px-4 max-w-sm ${isRoast ? 'text-red-300' : (isDarkMode ? 'text-slate-300' : 'text-slate-600')}`}>
             {memoryMessage}
           </p>
         )}
@@ -187,22 +187,22 @@ export const HeroWeather = ({
             ${isRoast
               ? 'bg-red-950/30 border-red-900/40 shadow-lg shadow-red-950/20'
               : isDarkMode
-                ? 'bg-slate-900/50 border-slate-800/80 shadow-md'
-                : 'bg-white/50 border-white/60 shadow-sm'
+                ? 'bg-slate-900/60 border-slate-800 shadow-md'
+                : 'bg-white/60 border-white/60 shadow-sm'
             }
           `}
         >
           <p 
             className={`
-              text-base font-semibold leading-relaxed
-              ${isRoast ? 'text-red-200' : isDarkMode ? 'text-slate-200' : 'text-slate-700'}
+              text-base font-bold leading-relaxed
+              ${isRoast ? 'text-red-100' : isDarkMode ? 'text-slate-100' : 'text-slate-800'}
             `}
           >
             "{mood.quote}"
           </p>
 
           {/* Advice Tag */}
-          <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium opacity-80">
+          <div className={`mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold ${isRoast ? 'text-red-300' : isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
             <Glasses size={14} className={isRoast ? 'text-red-400' : mood.text} />
             <span>{mood.advice}</span>
           </div>

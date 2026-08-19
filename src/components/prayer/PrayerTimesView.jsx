@@ -70,8 +70,8 @@ export const PrayerTimesView = ({
             className={`
               flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border backdrop-blur-xl
               ${isDarkMode 
-                ? 'bg-slate-900/60 border-slate-800 text-amber-400' 
-                : 'bg-white/70 border-white/70 text-amber-600 shadow-sm'
+                ? 'bg-slate-900/70 border-slate-800 text-amber-400' 
+                : 'bg-white/80 border-white/70 text-amber-600 shadow-sm'
               }
             `}
           >
@@ -80,8 +80,8 @@ export const PrayerTimesView = ({
           </div>
         )}
 
-        <div className="flex items-center gap-1 opacity-60 text-xs font-semibold">
-          <MapPin size={13} />
+        <div className={`flex items-center gap-1 text-xs font-semibold ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+          <MapPin size={13} className="text-emerald-500" />
           <span className="truncate max-w-[120px]">{locationName}</span>
         </div>
       </div>
@@ -92,24 +92,24 @@ export const PrayerTimesView = ({
           className={`
             relative overflow-hidden rounded-3xl p-5 shadow-2xl border mb-5 transition-all
             bg-gradient-to-br ${PRAYER_META[nextKey]?.gradient || 'from-emerald-950 to-slate-900'}
-            border-emerald-500/30 text-white
+            border-emerald-500/40 text-white
           `}
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <span className="text-3xl">{PRAYER_META[nextKey]?.emoji}</span>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300 bg-emerald-950/90 px-2.5 py-0.5 rounded-full border border-emerald-700">
                   {t.nextPrayer}
                 </span>
-                <h3 className="text-2xl font-black mt-1">
+                <h3 className="text-2xl font-black mt-1 text-white">
                   {t[nextKey.toLowerCase()]}
                 </h3>
               </div>
             </div>
 
             <div className="text-right">
-              <span className="text-2xl font-black tabular-nums tracking-tight">
+              <span className="text-2xl font-black tabular-nums tracking-tight text-white">
                 {formatPrayerTime(prayers[nextKey], lang)}
               </span>
               {countdownText && (
@@ -121,7 +121,7 @@ export const PrayerTimesView = ({
           </div>
 
           {/* Glowing live bar */}
-          <div className="w-full h-1.5 bg-black/30 rounded-full mt-4 overflow-hidden">
+          <div className="w-full h-1.5 bg-black/40 rounded-full mt-4 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full animate-pulse"></div>
           </div>
         </div>
@@ -141,10 +141,10 @@ export const PrayerTimesView = ({
               className={`
                 p-4 rounded-3xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-between
                 ${isNext
-                  ? `bg-gradient-to-r ${meta.gradient} border-emerald-500/50 shadow-lg text-white scale-[1.02]`
+                  ? `bg-gradient-to-r ${meta.gradient} border-emerald-500/60 shadow-lg text-white scale-[1.02]`
                   : isPast
-                    ? (isDarkMode ? 'bg-slate-900/30 border-slate-800/40 opacity-60' : 'bg-slate-100/50 border-slate-200/50 opacity-60')
-                    : (isDarkMode ? 'bg-slate-900/60 border-slate-800/80 text-white' : 'bg-white/70 border-white/70 text-slate-800 shadow-sm')
+                    ? (isDarkMode ? 'bg-slate-900/40 border-slate-800/50 text-slate-400 opacity-70' : 'bg-slate-100/60 border-slate-200 text-slate-500 opacity-70')
+                    : (isDarkMode ? 'bg-slate-900/60 border-slate-800 text-slate-100' : 'bg-white/80 border-white/70 text-slate-800 shadow-sm')
                 }
               `}
             >
@@ -153,7 +153,7 @@ export const PrayerTimesView = ({
                 <div>
                   <h4 className="text-sm font-extrabold">{label}</h4>
                   {isNext && (
-                    <span className="text-[10px] font-bold text-emerald-400 block">
+                    <span className="text-[10px] font-bold text-emerald-300 block">
                       {countdownText ? `${t.remaining} ${countdownText}` : ''}
                     </span>
                   )}
@@ -173,7 +173,7 @@ export const PrayerTimesView = ({
 
       {/* Method note */}
       <div className="mt-4 text-center">
-        <span className="text-[11px] opacity-40 font-semibold block">
+        <span className={`text-[11px] font-semibold block ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
           {t.methods?.habous || t.methods?.mwl}
         </span>
       </div>
