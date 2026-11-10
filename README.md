@@ -7,9 +7,12 @@
 ![Vite](https://img.shields.io/badge/Vite-5.0-purple?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-3.3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-Ready-green?style=for-the-badge&logo=pwa&logoColor=white)
+[![Netlify Status](https://img.shields.io/badge/Netlify-Live_Demo-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://mizaji-app.netlify.app)
 
 **رفيقك الجوي الساخر ومواقيت الصلاة بتصميم زجاجي فاخر**  
 *Your sarcastic weather companion & Islamic prayer hub with an ultra-premium glassmorphism UI.*
+
+### 🔗 **[تجربة التطبيق مباشرة | Live Demo](https://mizaji-app.netlify.app)**
 
 [عربي](#-نظرة-عامة-عن-التطبيق) • [English](#-overview) • [الميزات](#-الميزات-الرئيسية-key-features) • [التثبيت](#-التثبيت-والتشغيل-installation--setup) • [هيكلة المشروع](#-هيكلة-المشروع-project-structure)
 
@@ -142,7 +145,10 @@ npm run build
 
 ---
 
-## 🌐 نشر التطبيق (Deployment)
+## 🌐 التجربة المباشرة والنشر (Live Demo & Deployment)
+
+* **رابط التطبيق المباشر:**
+  [https://mizaji-app.netlify.app](https://mizaji-app.netlify.app)
 
 التطبيق جاهز للنشر الفوري بنقرة واحدة على منصات مثل:
 * **Vercel**
