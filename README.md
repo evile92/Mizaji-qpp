@@ -2,6 +2,8 @@
 
 <div align="center">
 
+<img src="public/logo.png" alt="Mizaji Logo" width="180" />
+
 ![Mizaji Logo](https://img.shields.io/badge/Mizaji-Weather%20%26%20Prayer-orange?style=for-the-badge&logo=sun&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.2-blue?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-5.0-purple?style=for-the-badge&logo=vite&logoColor=white)
@@ -89,8 +91,12 @@ Mizaji-qpp/
 ├── public/
 │   ├── manifest.json          # إعدادات تطبيق الـ PWA
 │   ├── sw.js                  # Service Worker للتخزين المؤقت
+│   ├── logo.png               # الشعار الرسمي الشفاف
+│   ├── favicon.png            # أيقونة المتصفح
+│   ├── apple-touch-icon.png   # أيقونة أجهزة Apple
 │   ├── icon-192.png           # أيقونة التطبيق 192px
-│   └── icon-512.png           # أيقونة التطبيق 512px
+│   ├── icon-512.png           # أيقونة التطبيق 512px
+│   └── icon-maskable-512.png  # أيقونة PWA المتكيفة (Maskable)
 ├── src/
 │   ├── hooks/                 # الخطافات المخصصة (Custom Hooks)
 │   │   ├── useWeather.js      # جلب وإدارة بيانات الطقس والتوقعات

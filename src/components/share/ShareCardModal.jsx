@@ -156,15 +156,18 @@ export const ShareCardModal = ({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '16px',
+              marginBottom: '14px',
               fontSize: '11px',
               fontWeight: 800,
               letterSpacing: '0.1em',
-              opacity: 0.7,
+              opacity: 0.9,
               textTransform: 'uppercase',
             }}
           >
-            <span>MIZAJI • مزاجي</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <img src="/logo.png" alt="Mizaji" style={{ height: '24px', width: 'auto', display: 'block' }} />
+              <span>مزاجي</span>
+            </div>
             <span>{isRoast ? '🔥 ROAST' : 'WEATHER'}</span>
           </div>
 

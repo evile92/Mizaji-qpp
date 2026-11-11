@@ -1,10 +1,14 @@
-const CACHE_NAME = 'mizaji-pwa-v3';
+const CACHE_NAME = 'mizaji-pwa-v4';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/logo.png',
+  '/favicon.png',
+  '/apple-touch-icon.png',
   '/icon-192.png',
   '/icon-512.png',
+  '/icon-maskable-512.png',
 ];
 
 // ── Install: Cache essential shell assets safely ──────────────────────────────

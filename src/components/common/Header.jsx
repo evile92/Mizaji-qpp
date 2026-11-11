@@ -37,7 +37,17 @@ export const Header = ({
   };
 
   return (
-    <header className="relative z-30 px-4 pt-4 pb-2 max-w-lg mx-auto w-full flex flex-col gap-3">
+    <header className="relative z-30 px-4 pt-3 pb-2 max-w-lg mx-auto w-full flex flex-col gap-2.5">
+      {/* Brand Logo */}
+      <div className="flex items-center justify-center">
+        <img
+          src="/logo.png"
+          alt="Mizaji"
+          className="h-11 w-auto object-contain drop-shadow-md select-none"
+          draggable="false"
+        />
+      </div>
+
       {/* Top action row */}
       <div className="flex items-center justify-between gap-2">
         {/* Left: Language, Unit & Roast Trigger */}
