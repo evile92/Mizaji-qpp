@@ -1,13 +1,14 @@
 import React from 'react';
 import { Calendar, Droplets } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
-import { getWeatherIcon, formatDate } from '../../utils/weatherHelpers';
+import { getWeatherIcon, formatDate, convertTemp } from '../../utils/weatherHelpers';
 
 export const DailyForecastGrid = ({
   dailyData,
   selectedDayIndex,
   onSelectDay,
   lang,
+  unit = 'metric',
   isDarkMode,
   personality,
 }) => {
@@ -93,7 +94,7 @@ export const DailyForecastGrid = ({
 
               {/* Min Temp */}
               <span className="text-xs font-bold opacity-60 w-8 text-right tabular-nums">
-                {Math.round(day.tempMin)}°
+                {Math.round(convertTemp(day.tempMin, unit))}°
               </span>
 
               {/* Visual Temperature Range Bar */}
@@ -117,7 +118,7 @@ export const DailyForecastGrid = ({
 
               {/* Max Temp */}
               <span className="text-sm font-extrabold w-8 text-right tabular-nums">
-                {Math.round(day.tempMax)}°
+                {Math.round(convertTemp(day.tempMax, unit))}°
               </span>
             </button>
           );

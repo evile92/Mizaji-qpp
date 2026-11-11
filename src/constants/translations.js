@@ -43,6 +43,56 @@ export const TRANSLATIONS = {
     copiedCard: 'Card Copied!',
     downloadPng: 'Download PNG',
     copiedToast: 'Copied!',
+    favorites: 'Favorite Cities',
+    recentCities: 'Recent Searches',
+    aqi: 'Air Quality',
+    outfitTitle: 'Outfit Check',
+
+    // AQI Levels
+    aqiLevels: {
+      good: 'Good',
+      fair: 'Fair',
+      moderate: 'Moderate',
+      poor: 'Poor',
+      veryPoor: 'Very Poor',
+      extreme: 'Hazardous',
+    },
+
+    // Visibility Levels
+    visibilityLevels: {
+      clear: 'Crystal Clear',
+      moderate: 'Moderate',
+      low: 'Low Visibility',
+    },
+
+    // Outfit Advice
+    outfit: {
+      freezing: {
+        calm: 'Heavy winter coat, scarf, and warm layers.',
+        sarcastic: 'Dress like an onion. Minimum 4 layers unless you enjoy shivering.',
+        roast: 'Wear everything in your closet at once. Fashion died below 10°.',
+      },
+      cool: {
+        calm: 'A light jacket or cozy hoodie will feel just right.',
+        sarcastic: 'Hoodie weather—pretend it is an aesthetic choice.',
+        roast: 'Grab a real jacket before you spend the day complaining about the breeze.',
+      },
+      mild: {
+        calm: 'Breathable cotton shirt or light layers.',
+        sarcastic: 'Normal human clothes. Try not to overthink it.',
+        roast: 'T-shirt weather. Please make sure it was washed this week.',
+      },
+      hot: {
+        calm: 'Light, loose clothing, sunglasses, and sun protection.',
+        sarcastic: 'Wear the lightest fabric you own and stay near AC.',
+        roast: 'Wear minimal breathable layers—unless you enjoy marinating in your own sweat.',
+      },
+      rainAddon: {
+        calm: 'Bring a waterproof jacket or umbrella.',
+        sarcastic: 'Add an umbrella unless your hair enjoys chaos.',
+        roast: 'Take an umbrella and waterproof shoes, not suede.',
+      },
+    },
     
     // UV Levels
     uvLevels: {
@@ -69,8 +119,8 @@ export const TRANSLATIONS = {
 
     // Memory comparison
     memory: {
-      warmer: 'Warmer than yesterday (+{diff}°C).',
-      colder: 'Colder than yesterday (-{diff}°C).',
+      warmer: 'Warmer than yesterday (+{diff}°).',
+      colder: 'Colder than yesterday (-{diff}°).',
       same: 'Identical temperature to yesterday.',
       roast_warmer: 'Warmer than yesterday. Still not an excuse to wear flip-flops in public.',
       roast_colder: 'Colder than yesterday. The weather is as cold as your ex.',
@@ -327,6 +377,15 @@ export const TRANSLATIONS = {
         egypt: 'Egyptian General Authority',
       },
       athanToggle: 'Prayer Alert Sound',
+      athanAlertOn: 'Alerts Active',
+      athanAlertOff: 'Enable Alerts',
+      athanPermissionDenied: 'Notifications blocked in browser',
+      athanArrived: 'Time for {prayer} prayer',
+      liveCompass: 'Live Compass',
+      enableLiveCompass: 'Live Compass',
+      compassHint: 'Hold phone flat',
+      staticCompass: 'From True North',
+      compassUnavailable: 'Sensor unavailable',
     },
   },
 
@@ -374,6 +433,56 @@ export const TRANSLATIONS = {
     copiedCard: 'تم نسخ البطاقة!',
     downloadPng: 'تحميل PNG',
     copiedToast: 'تم النسخ بنجاح!',
+    favorites: 'المدن المفضلة',
+    recentCities: 'عمليات البحث الأخيرة',
+    aqi: 'جودة الهواء',
+    outfitTitle: 'اقتراح الملابس',
+
+    // AQI Levels
+    aqiLevels: {
+      good: 'ممتازة',
+      fair: 'جيدة',
+      moderate: 'متوسطة',
+      poor: 'سيئة',
+      veryPoor: 'سيئة جداً',
+      extreme: 'خطيرة',
+    },
+
+    // Visibility Levels
+    visibilityLevels: {
+      clear: 'رؤية واضحة',
+      moderate: 'رؤية متوسطة',
+      low: 'رؤية منخفضة',
+    },
+
+    // Outfit Advice
+    outfit: {
+      freezing: {
+        calm: 'معطف شتوي ثقيل ووشاح وطبقات دافئة.',
+        sarcastic: 'البس مثل البصلة على عدة طبقات إن كنت لا تحب الارتجاف.',
+        roast: 'ارتدِ كل ما في خزانتك دفعة واحدة؛ الأناقة تتجمد تحت 10 درجات.',
+      },
+      cool: {
+        calm: 'سترة خفيفة أو هودي مريح ستكون مناسبة تماماً.',
+        sarcastic: 'طقس مثالي للهودي لتبدو غامضاً بدون مجهود.',
+        roast: 'خذ سترة حقيقية بدلاً من الشكوى من البرد طوال اليوم.',
+      },
+      mild: {
+        calm: 'ملابس قطنية مريحة وخفيفة.',
+        sarcastic: 'ملابس بشر طبيعية، لا تبالغ في التفكير.',
+        roast: 'جو قميص خفيف، فقط تأكد أنه نظيف ومكوي.',
+      },
+      hot: {
+        calm: 'ملابس قطنية فضفاضة وفاتحة اللون مع نظارات شمسية.',
+        sarcastic: 'اختر أخف قماش في خزانتك والتصق بالمكيف.',
+        roast: 'ارتدِ أخف ما لديك قبل أن تتحول إلى وجبة مشوية في الشارع.',
+      },
+      rainAddon: {
+        calm: 'لا تنسَ مظلة أو معطفاً مقاوماً للماء.',
+        sarcastic: 'أضف مظلة إن كان شعرك لا يحب المغامرات.',
+        roast: 'احمل مظلة وحذاءً مقاوماً للماء، ودع الجلد المدبوغ في البيت.',
+      },
+    },
 
     // UV Levels
     uvLevels: {
@@ -401,7 +510,7 @@ export const TRANSLATIONS = {
     // Memory comparison
     memory: {
       warmer: 'أدفأ من طقس الأمس بنحو ({diff}°+).',
-      colder: 'أبرد من طقس الأمس بنحو ({diff}°-) مئوية.',
+      colder: 'أبرد من طقس الأمس بنحو ({diff}°-) درجة.',
       same: 'نفس درجات حرارة الأمس تماماً.',
       roast_warmer: 'أدفأ من الأمس، لكن لا داعي للاستعراض وكأنك في ميامي.',
       roast_colder: 'أبرد من الأمس. الطقس قاسي مثل قراراتك المالية.',
@@ -658,6 +767,15 @@ export const TRANSLATIONS = {
         egypt: 'الهيئة المصرية العامة للمساحة',
       },
       athanToggle: 'تنبيه الأذان',
+      athanAlertOn: 'التنبيهات مفعّلة',
+      athanAlertOff: 'تفعيل التنبيه',
+      athanPermissionDenied: 'الإشعارات محظورة من المتصفح',
+      athanArrived: 'حان الآن موعد صلاة {prayer}',
+      liveCompass: 'بوصلة حية',
+      enableLiveCompass: 'تفعيل البوصلة',
+      compassHint: 'حرّك الهاتف أفقياً',
+      staticCompass: 'نسبةً للشمال',
+      compassUnavailable: 'المستشعر غير مدعوم',
     },
   },
 
@@ -705,6 +823,56 @@ export const TRANSLATIONS = {
     copiedCard: 'تكوبات الكارطة!',
     downloadPng: 'تيليشارجي PNG',
     copiedToast: 'ناضي، تكوبات!',
+    favorites: 'المدن المفضلة',
+    recentCities: 'آخر المدن اللي قلبتي عليهم',
+    aqi: 'نقاوة الهوا',
+    outfitTitle: 'شنو تلبس اليوم',
+
+    // AQI Levels
+    aqiLevels: {
+      good: 'نقية',
+      fair: 'مزيانة',
+      moderate: 'بين وبين',
+      poor: 'مغبرة شوية',
+      veryPoor: 'مكرفصة',
+      extreme: 'سم صافي',
+    },
+
+    // Visibility Levels
+    visibilityLevels: {
+      clear: 'الشوفة ناضية',
+      moderate: 'الشوفة مقبولة',
+      low: 'الضبابة شادة',
+    },
+
+    // Outfit Advice
+    outfit: {
+      freezing: {
+        calm: 'مونطو سخون وكاشكول وحوايج تقال.',
+        sarcastic: 'تغطى بحال الملفوف ولا غادي تقفقف.',
+        roast: 'لبس الماريو كاملو فدقة وحدة؛ البرد ما كايعرفش الشياكة.',
+      },
+      cool: {
+        calm: 'جاكيطة خفيفة ولا قبية مقادة غادي تليق بزاف.',
+        sarcastic: 'وقت القبية باش تبان مهيب وساكت.',
+        roast: 'هز معاك جاكيطة د بصح بلا ما تبقى تشتكي من البرد نهار كامل.',
+      },
+      mild: {
+        calm: 'تريكو خفيف ولا لبسة عادية مريحة.',
+        sarcastic: 'حوايج بنادم عاديين، بلا ما تفلسف.',
+        roast: 'وقت تريكو خفيف.. غير تأكد أنه مصبن هاد السيمانة.',
+      },
+      hot: {
+        calm: 'حوايج خفاف وفضفاضين ونظاظر د الشمش.',
+        sarcastic: 'لبس أخف ما عندك وقرب من الكليماتيزور.',
+        roast: 'لبس أخف تريكو عندك قبل ما ترجع بحال الطاجين وسط الزنقة.',
+      },
+      rainAddon: {
+        calm: 'دي معاك بارابلوي ولا جاكيطة د الشتا.',
+        sarcastic: 'زيد البارابلوي إلا ما بغيتيش شعرك يتفرتك.',
+        roast: 'هز البارابلوي وسبادري ما كاتشربش الما، ماشي السويدي.',
+      },
+    },
 
     // UV Levels
     uvLevels: {
@@ -989,6 +1157,15 @@ export const TRANSLATIONS = {
         egypt: 'الهيئة المصرية العامة للمساحة',
       },
       athanToggle: 'تنبيه الأذان',
+      athanAlertOn: 'التنبيه خدام',
+      athanAlertOff: 'شعل التنبيه',
+      athanPermissionDenied: 'متصفحك حابس الإشعارات',
+      athanArrived: 'دخل وقت صلاة {prayer}',
+      liveCompass: 'بوصلة لايف',
+      enableLiveCompass: 'خدم البوصلة',
+      compassHint: 'دور التيليفون مسرح',
+      staticCompass: 'على حساب الشمال',
+      compassUnavailable: 'المستشعر ما خدامش',
     },
   },
 };

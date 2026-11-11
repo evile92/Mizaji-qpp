@@ -275,3 +275,93 @@ export const formatDate = (isoDate, lang = 'en') => {
   const locale = lang === 'en' ? 'en-US' : 'ar-MA';
   return d.toLocaleDateString(locale, { weekday: 'short', month: 'numeric', day: 'numeric' });
 };
+
+/**
+ * Convert Celsius temperature to target display unit ('metric' | 'imperial').
+ */
+export const convertTemp = (celsius, unit = 'metric') => {
+  if (celsius === null || celsius === undefined || Number.isNaN(Number(celsius))) return 0;
+  return unit === 'imperial' ? (Number(celsius) * 9) / 5 + 32 : Number(celsius);
+};
+
+/**
+ * Convert a Celsius temperature delta to target display unit.
+ */
+export const convertTempDiff = (celsiusDiff, unit = 'metric') => {
+  if (celsiusDiff === null || celsiusDiff === undefined || Number.isNaN(Number(celsiusDiff))) return 0;
+  return unit === 'imperial' ? (Number(celsiusDiff) * 9) / 5 : Number(celsiusDiff);
+};
+
+/**
+ * Convert wind speed from km/h to km/h or mph.
+ */
+export const convertWindSpeed = (kmh, unit = 'metric') => {
+  if (kmh === null || kmh === undefined || Number.isNaN(Number(kmh))) return 0;
+  return unit === 'imperial' ? Number(kmh) * 0.621371 : Number(kmh);
+};
+
+/**
+ * Format visibility distance from meters to km or miles.
+ */
+export const formatVisibility = (meters, unit = 'metric') => {
+  if (meters === null || meters === undefined || Number.isNaN(Number(meters))) {
+    return { value: '-', unit: '' };
+  }
+  const dist = unit === 'imperial' ? Number(meters) / 1609.34 : Number(meters) / 1000;
+  return {
+    value: dist >= 10 ? String(Math.round(dist)) : dist.toFixed(1),
+    unit: unit === 'imperial' ? 'mi' : 'km',
+  };
+};
+
+/**
+ * Map European AQI index to localized label and semantic color class.
+ */
+export const getAQILevel = (aqi, lang = 'en') => {
+  const t = TRANSLATIONS[lang]?.aqiLevels || TRANSLATIONS.en.aqiLevels;
+  if (aqi === null || aqi === undefined || Number.isNaN(Number(aqi))) {
+    return { label: '-', color: 'text-slate-400' };
+  }
+  const val = Number(aqi);
+  if (val <= 20) return { label: t.good, color: 'text-emerald-500' };
+  if (val <= 40) return { label: t.fair, color: 'text-teal-500' };
+  if (val <= 60) return { label: t.moderate, color: 'text-yellow-500' };
+  if (val <= 80) return { label: t.poor, color: 'text-orange-500' };
+  if (val <= 100) return { label: t.veryPoor, color: 'text-rose-500' };
+  return { label: t.extreme, color: 'text-purple-500' };
+};
+
+/**
+ * Map visibility meters to localized qualitative label.
+ */
+export const getVisibilityLevel = (meters, lang = 'en') => {
+  const t = TRANSLATIONS[lang]?.visibilityLevels || TRANSLATIONS.en.visibilityLevels;
+  if (meters === null || meters === undefined || Number.isNaN(Number(meters))) return '-';
+  const val = Number(meters);
+  if (val >= 10000) return t.clear;
+  if (val >= 4000) return t.moderate;
+  return t.low;
+};
+
+/**
+ * Resolve persona-matched outfit advice from canonical Celsius temperature and rain signals.
+ */
+export const getOutfitAdvice = (activeData, moodType, lang = 'en', personality = 'sarcastic') => {
+  const outfitT = TRANSLATIONS[lang]?.outfit || TRANSLATIONS.en.outfit;
+  if (!activeData || !outfitT) return '';
+
+  const pKey = ['calm', 'sarcastic', 'roast'].includes(personality) ? personality : 'sarcastic';
+  const feels = Number(activeData.feelsLike ?? activeData.temp ?? 20);
+
+  let band = 'mild';
+  if (feels < 10) band = 'freezing';
+  else if (feels < 18) band = 'cool';
+  else if (feels > 26) band = 'hot';
+
+  const base = outfitT[band]?.[pKey] || outfitT[band]?.sarcastic || '';
+  const needsRainGear = moodType === 'rainy' || moodType === 'stormy' || Number(activeData.precipProb ?? 0) >= 40;
+  if (!needsRainGear) return base;
+
+  const rainAddon = outfitT.rainAddon?.[pKey] || outfitT.rainAddon?.sarcastic || '';
+  return rainAddon ? `${base} ${rainAddon}` : base;
+};

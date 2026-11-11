@@ -20,6 +20,32 @@ export const POPULAR_CITIES = [
 ];
 
 const DEFAULT_LOCATION = POPULAR_CITIES[0]; // Tetouan
+const FAVORITES_KEY = 'mizaji_favorites';
+const RECENT_KEY = 'mizaji_recent_cities';
+const MAX_RECENT_CITIES = 5;
+
+const readStoredList = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeStoredList = (key, list) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch {
+    // ignore storage quota errors
+  }
+};
+
+const isSameCity = (a, b) => {
+  if (!a || !b) return false;
+  return Math.abs(Number(a.lat) - Number(b.lat)) < 0.02 && Math.abs(Number(a.lon) - Number(b.lon)) < 0.02;
+};
 
 export const useLocation = (lang = 'en') => {
   const [location, setLocation] = useState(() => {
@@ -32,13 +58,15 @@ export const useLocation = (lang = 'en') => {
     return DEFAULT_LOCATION;
   });
 
+  const [favorites, setFavorites] = useState(() => readStoredList(FAVORITES_KEY));
+  const [recentCities, setRecentCities] = useState(() => readStoredList(RECENT_KEY));
   const [isGpsActive, setIsGpsActive] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
   // Reverse geocoding helper to resolve city name from latitude & longitude
-  const reverseGeocode = async (lat, lon) => {
+  const reverseGeocode = useCallback(async (lat, lon) => {
     try {
       const res = await fetch(
         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${lang === 'en' ? 'en' : 'ar'}`
@@ -53,7 +81,7 @@ export const useLocation = (lang = 'en') => {
       console.warn('Reverse geocode fallback:', e);
     }
     return { city: TRANSLATIONS[lang]?.yourLocation || 'Current Location', country: '' };
-  };
+  }, [lang]);
 
   // Request user GPS location
   const detectGpsLocation = useCallback(() => {
@@ -94,10 +122,10 @@ export const useLocation = (lang = 'en') => {
       },
       { timeout: 8000, enableHighAccuracy: true }
     );
-  }, [lang]);
+  }, [reverseGeocode]);
 
-  // Set specific city from search or popular list
-  const selectCity = (cityObj) => {
+  // Set specific city from search, favorites, recent, or popular list
+  const selectCity = useCallback((cityObj) => {
     const newLoc = {
       ...cityObj,
       isGps: false,
@@ -109,12 +137,35 @@ export const useLocation = (lang = 'en') => {
     } catch (e) {
       // ignore
     }
-  };
+
+    setRecentCities((prev) => {
+      const updated = [newLoc, ...prev.filter((c) => !isSameCity(c, newLoc))].slice(0, MAX_RECENT_CITIES);
+      writeStoredList(RECENT_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  // Pin or unpin a favorite city
+  const toggleFavorite = useCallback((cityObj) => {
+    if (!cityObj) return;
+    setFavorites((prev) => {
+      const exists = prev.some((c) => isSameCity(c, cityObj));
+      const updated = exists
+        ? prev.filter((c) => !isSameCity(c, cityObj))
+        : [{ ...cityObj, isGps: false }, ...prev];
+      writeStoredList(FAVORITES_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const isFavorite = useCallback((cityObj) => {
+    return favorites.some((c) => isSameCity(c, cityObj));
+  }, [favorites]);
 
   // Search cities via Open-Meteo Geocoding API
-  const searchCities = async (query) => {
+  const searchCities = useCallback(async (query) => {
     if (!query || query.trim().length < 2) {
-      setSearchResults([]);
+      setSearchResults((prev) => (prev.length === 0 ? prev : []));
       return;
     }
     setIsSearching(true);
@@ -145,7 +196,7 @@ export const useLocation = (lang = 'en') => {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [lang]);
 
   // Format current location name for display in active language
   const getLocationDisplayName = () => {
@@ -166,5 +217,9 @@ export const useLocation = (lang = 'en') => {
     searchResults,
     isSearching,
     popularCities: POPULAR_CITIES,
+    favorites,
+    recentCities,
+    toggleFavorite,
+    isFavorite,
   };
 };

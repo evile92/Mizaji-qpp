@@ -108,8 +108,44 @@ export const useSoundEffects = () => {
     }
   }, [getAudioContext]);
 
+  // Gentle 3-note harmonic chime for prayer arrival alerts
+  const playPrayerChime = useCallback(() => {
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate([120, 60, 120]);
+      }
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 warm triad
+
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const start = now + idx * 0.16;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+
+        gain.gain.setValueAtTime(0.001, start);
+        gain.gain.exponentialRampToValueAtTime(0.22, start + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.9);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(start);
+        osc.stop(start + 0.95);
+      });
+    } catch (e) {
+      // Ignore audio errors when muted/blocked
+    }
+  }, [getAudioContext]);
+
   return {
     playRoastSound,
     playTapSound,
+    playPrayerChime,
   };
 };

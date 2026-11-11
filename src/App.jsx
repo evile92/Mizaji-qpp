@@ -31,7 +31,16 @@ const App = () => {
     return true; // Default to sleek dark mode
   });
 
-  const [personality, setPersonality] = useState('sarcastic'); // 'calm' | 'sarcastic' | 'roast'
+  const [personality, setPersonality] = useState(() => {
+    const saved = localStorage.getItem('mizaji_personality');
+    return ['calm', 'sarcastic', 'roast'].includes(saved) ? saved : 'sarcastic';
+  }); // 'calm' | 'sarcastic' | 'roast'
+
+  const [unit, setUnit] = useState(() => {
+    const saved = localStorage.getItem('mizaji_unit');
+    return saved === 'imperial' ? 'imperial' : 'metric';
+  }); // 'metric' | 'imperial'
+
   const [activeTab, setActiveTab] = useState('weather'); // 'weather' | 'prayer'
 
   // Modals
@@ -40,7 +49,7 @@ const App = () => {
   const [showShareModal, setShowShareModal] = useState(false);
 
   // Sound Engine
-  const { playRoastSound, playTapSound } = useSoundEffects();
+  const { playRoastSound, playTapSound, playPrayerChime } = useSoundEffects();
 
   // Location Hook
   const {
@@ -53,6 +62,10 @@ const App = () => {
     searchResults,
     isSearching,
     popularCities,
+    favorites,
+    recentCities,
+    toggleFavorite,
+    isFavorite,
   } = useLocation(lang);
 
   // Weather Hook
@@ -73,14 +86,18 @@ const App = () => {
   const {
     prayers,
     hijri,
+    nowMins,
     nextPrayerInfo,
     qiblaAngle,
     loading: prayerLoading,
     error: prayerError,
     calcMethod,
     setCalcMethod,
+    alertsEnabled,
+    alertPermission,
+    toggleAlerts,
     refreshPrayers,
-  } = usePrayerTimes(location.lat, location.lon, lang);
+  } = usePrayerTimes(location.lat, location.lon, lang, playPrayerChime);
 
   // Sync Dark Mode class on <html> & <meta name="theme-color">
   useEffect(() => {
@@ -101,15 +118,29 @@ const App = () => {
     }
   }, [isDarkMode, personality]);
 
-  // Sync Language
+  // Sync Language, Personality & Unit
   useEffect(() => {
     localStorage.setItem('mizaji_lang', lang);
   }, [lang]);
+
+  useEffect(() => {
+    localStorage.setItem('mizaji_personality', personality);
+  }, [personality]);
+
+  useEffect(() => {
+    localStorage.setItem('mizaji_unit', unit);
+  }, [unit]);
 
   // Language toggle cycle (AR -> MA -> EN -> AR)
   const handleToggleLang = useCallback(() => {
     playTapSound();
     setLang((prev) => (prev === 'ar' ? 'ma' : prev === 'ma' ? 'en' : 'ar'));
+  }, [playTapSound]);
+
+  // Temperature / Wind unit toggle (°C <-> °F)
+  const handleToggleUnit = useCallback(() => {
+    playTapSound();
+    setUnit((prev) => (prev === 'metric' ? 'imperial' : 'metric'));
   }, [playTapSound]);
 
   // Dark mode toggle
@@ -183,6 +214,8 @@ const App = () => {
       <Header
         lang={lang}
         onToggleLang={handleToggleLang}
+        unit={unit}
+        onToggleUnit={handleToggleUnit}
         isDarkMode={isDarkMode}
         onToggleDarkMode={handleToggleDarkMode}
         personality={personality}
@@ -217,6 +250,7 @@ const App = () => {
                   onChangePersonality={handleChangePersonality}
                   onShuffleRoast={shuffleRoastQuote}
                   lang={lang}
+                  unit={unit}
                   isDarkMode={isDarkMode}
                   onTapEffect={playTapSound}
                 />
@@ -226,6 +260,7 @@ const App = () => {
                   hourlyData={selectedDayHourly}
                   isToday={activeDayData.isToday}
                   lang={lang}
+                  unit={unit}
                   isDarkMode={isDarkMode}
                   personality={personality}
                 />
@@ -240,15 +275,17 @@ const App = () => {
                       setSelectedDayIndex(idx);
                     }}
                     lang={lang}
+                    unit={unit}
                     isDarkMode={isDarkMode}
                     personality={personality}
                   />
                 )}
 
-                {/* Detailed 6-Card Metrics Grid */}
+                {/* Detailed Metrics Grid */}
                 <WeatherMetricsGrid
                   activeData={activeDayData}
                   lang={lang}
+                  unit={unit}
                   isDarkMode={isDarkMode}
                   personality={personality}
                 />
@@ -262,6 +299,7 @@ const App = () => {
           <PrayerTimesView
             prayers={prayers}
             hijri={hijri}
+            nowMins={nowMins}
             nextPrayerInfo={nextPrayerInfo}
             qiblaAngle={qiblaAngle}
             locationName={locationDisplayName}
@@ -269,6 +307,9 @@ const App = () => {
             error={prayerError}
             calcMethod={calcMethod}
             onChangeCalcMethod={setCalcMethod}
+            alertsEnabled={alertsEnabled}
+            alertPermission={alertPermission}
+            onToggleAlerts={toggleAlerts}
             onRefresh={refreshPrayers}
             lang={lang}
             isDarkMode={isDarkMode}
@@ -301,6 +342,13 @@ const App = () => {
         searchResults={searchResults}
         isSearching={isSearching}
         popularCities={popularCities}
+        favorites={favorites}
+        recentCities={recentCities}
+        onToggleFavorite={(city) => {
+          toggleFavorite(city);
+          playTapSound();
+        }}
+        isFavorite={isFavorite}
         lang={lang}
         isDarkMode={isDarkMode}
       />
@@ -324,6 +372,7 @@ const App = () => {
         activeData={activeDayData}
         locationName={locationDisplayName}
         lang={lang}
+        unit={unit}
         personality={personality}
         isDarkMode={isDarkMode}
       />

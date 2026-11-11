@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Share2, X, Download, Copy, Check, Sparkles, Loader2 } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
+import { convertTemp, convertWindSpeed } from '../../utils/weatherHelpers';
 
 // High-fidelity card styles with inline CSS for html2canvas reliability
 const cardThemes = {
@@ -21,6 +22,7 @@ export const ShareCardModal = ({
   activeData,
   locationName,
   lang,
+  unit = 'metric',
   personality,
   isDarkMode,
 }) => {
@@ -45,6 +47,11 @@ export const ShareCardModal = ({
   };
 
   const weatherEmoji = emojiMap[mood.type] || '🌡️';
+
+  const displayTemp = Math.round(convertTemp(activeData.temp, unit));
+  const tempSymbol = unit === 'imperial' ? '°F' : '°C';
+  const displayWind = Math.round(convertWindSpeed(activeData.wind, unit));
+  const windUnit = unit === 'imperial' ? 'mph' : 'km/h';
 
   const handleCapture = async (action = 'share') => {
     if (!cardRef.current || capturing) return;
@@ -78,7 +85,7 @@ export const ShareCardModal = ({
           const file = new File([blob], 'mizaji-weather.png', { type: 'image/png' });
           await navigator.share({
             title: 'Mizaji | مزاجي',
-            text: `${Math.round(activeData.temp)}°C – "${mood.quote}"`,
+            text: `${displayTemp}${tempSymbol} – "${mood.quote}"`,
             files: [file],
           });
         } else {
@@ -176,7 +183,7 @@ export const ShareCardModal = ({
               marginBottom: '4px',
             }}
           >
-            {Math.round(activeData.temp)}°
+            {displayTemp}°
           </div>
 
           {/* Condition Label */}
@@ -221,7 +228,7 @@ export const ShareCardModal = ({
             }}
           >
             <span>💧 {Math.round(activeData.humidity)}%</span>
-            <span>💨 {Math.round(activeData.wind)} km/h</span>
+            <span>💨 {displayWind} {windUnit}</span>
             <span>📍 {locationName}</span>
           </div>
         </div>

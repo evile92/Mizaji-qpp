@@ -6,34 +6,49 @@ import {
   SunMedium, 
   Gauge, 
   CloudRain, 
+  Eye,
+  Leaf,
   Sunrise, 
   Sunset,
   Navigation
 } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
-import { getUVLevel } from '../../utils/weatherHelpers';
+import {
+  getUVLevel,
+  getAQILevel,
+  getVisibilityLevel,
+  convertTemp,
+  convertWindSpeed,
+  formatVisibility,
+} from '../../utils/weatherHelpers';
 
-export const WeatherMetricsGrid = ({ activeData, lang, isDarkMode, personality }) => {
+export const WeatherMetricsGrid = ({ activeData, lang, unit = 'metric', isDarkMode, personality }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
   const isRoast = personality === 'roast';
   const uvInfo = getUVLevel(activeData?.uvIndex, lang);
+  const aqiInfo = getAQILevel(activeData?.aqi, lang);
+  const visFormatted = formatVisibility(activeData?.visibility, unit);
+  const visLevel = getVisibilityLevel(activeData?.visibility, lang);
 
   if (!activeData) return null;
+
+  const tempUnit = unit === 'imperial' ? '°F' : '°C';
+  const windUnit = unit === 'imperial' ? 'mph' : 'km/h';
 
   const metrics = [
     {
       id: 'feelsLike',
       label: t.feelsLike,
-      value: Math.round(activeData.feelsLike),
-      unit: '°C',
+      value: Math.round(convertTemp(activeData.feelsLike, unit)),
+      unit: tempUnit,
       icon: Thermometer,
-      subtext: `${t.today}: ${Math.round(activeData.temp)}°C`,
+      subtext: `${t.today}: ${Math.round(convertTemp(activeData.temp, unit))}${tempUnit}`,
     },
     {
       id: 'wind',
       label: t.wind,
-      value: Math.round(activeData.wind),
-      unit: 'km/h',
+      value: Math.round(convertWindSpeed(activeData.wind, unit)),
+      unit: windUnit,
       icon: Wind,
       subtext: `${t.direction}: ${activeData.windDirection}`,
       extraIcon: Navigation,
@@ -71,6 +86,24 @@ export const WeatherMetricsGrid = ({ activeData, lang, isDarkMode, personality }
       icon: Gauge,
       subtext: activeData.pressure >= 1013 ? (lang === 'en' ? 'High' : 'مرتفع') : (lang === 'en' ? 'Low' : 'منخفض'),
     },
+    {
+      id: 'visibility',
+      label: t.visibility,
+      value: visFormatted.value,
+      unit: visFormatted.unit,
+      icon: Eye,
+      subtext: visLevel,
+    },
+    {
+      id: 'aqi',
+      label: t.aqi,
+      value: activeData.aqi !== null && activeData.aqi !== undefined ? Math.round(activeData.aqi) : '-',
+      unit: activeData.aqi !== null && activeData.aqi !== undefined ? 'EAQI' : '',
+      icon: Leaf,
+      badge: aqiInfo.label,
+      badgeColor: aqiInfo.color,
+      subtext: activeData.pm25 !== null && activeData.pm25 !== undefined ? `PM2.5: ${activeData.pm25} µg/m³` : undefined,
+    },
   ];
 
   return (
@@ -86,7 +119,7 @@ export const WeatherMetricsGrid = ({ activeData, lang, isDarkMode, personality }
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5">
         {metrics.map((m) => {
           const MIcon = m.icon;
           return (

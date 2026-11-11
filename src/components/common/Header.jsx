@@ -14,6 +14,8 @@ import {
 export const Header = ({
   lang,
   onToggleLang,
+  unit = 'metric',
+  onToggleUnit,
   isDarkMode,
   onToggleDarkMode,
   personality,
@@ -38,7 +40,7 @@ export const Header = ({
     <header className="relative z-30 px-4 pt-4 pb-2 max-w-lg mx-auto w-full flex flex-col gap-3">
       {/* Top action row */}
       <div className="flex items-center justify-between gap-2">
-        {/* Left: Language & Roast Trigger */}
+        {/* Left: Language, Unit & Roast Trigger */}
         <div className="flex items-center gap-1.5">
           <button
             onClick={onToggleLang}
@@ -53,6 +55,20 @@ export const Header = ({
           >
             <Globe size={14} className="opacity-70" />
             <span>{langLabels[lang] || 'EN'}</span>
+          </button>
+
+          <button
+            onClick={onToggleUnit}
+            aria-label="Toggle Temperature Unit"
+            className={`
+              px-2.5 py-1.5 rounded-full text-xs font-extrabold tabular-nums transition-all duration-300
+              ${isDarkMode 
+                ? 'bg-slate-900/60 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
+                : 'bg-white/70 border border-white/60 text-slate-800 hover:bg-white shadow-sm'
+              } backdrop-blur-xl active:scale-95
+            `}
+          >
+            {unit === 'imperial' ? '°F' : '°C'}
           </button>
 
           <button

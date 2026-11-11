@@ -1,12 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { Droplets, Clock } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
-import { getWeatherIcon } from '../../utils/weatherHelpers';
+import { getWeatherIcon, convertTemp } from '../../utils/weatherHelpers';
 
 export const HourlyForecastList = ({
   hourlyData,
   isToday,
   lang,
+  unit = 'metric',
   isDarkMode,
   personality,
 }) => {
@@ -95,7 +96,7 @@ export const HourlyForecastList = ({
 
               {/* Temp */}
               <span className="text-base font-black tabular-nums">
-                {Math.round(item.temp)}°
+                {Math.round(convertTemp(item.temp, unit))}°
               </span>
 
               {/* Rain probability if > 0 */}

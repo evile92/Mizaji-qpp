@@ -1,29 +1,104 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { TRANSLATIONS } from '../constants/translations';
-import { 
-  getNowMinutes, 
-  calculateNextPrayer, 
-  calculateQiblaBearing 
+import {
+  CALCULATION_METHODS,
+  getNowMinutes,
+  getDateKeyInTimeZone,
+  toMinutes,
+  calculateNextPrayer,
+  calculateQiblaBearing,
 } from '../utils/prayerHelpers';
 
-export const usePrayerTimes = (lat, lon, lang = 'en') => {
+const METHOD_STORAGE_KEY = 'mizaji_prayer_method';
+const ALERTS_STORAGE_KEY = 'mizaji_athan_alerts';
+const ALERT_PRAYER_KEYS = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+export const usePrayerTimes = (lat, lon, lang = 'en', onPrayerArrive) => {
   const [prayers, setPrayers] = useState(null);
   const [hijri, setHijri] = useState(null);
+  const [timezone, setTimezone] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [nowMins, setNowMins] = useState(getNowMinutes());
-  const [calcMethod, setCalcMethod] = useState(3); // 3 = Muslim World League (MWL), 4 = Makkah, 5 = Egyptian
+  const [nowMins, setNowMins] = useState(() => getNowMinutes());
+  const firedAlertsRef = useRef(new Set());
 
-  // Tick clock every 30 seconds for live countdown accuracy
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNowMins(getNowMinutes());
-    }, 30000);
-    return () => clearInterval(timer);
+  const [calcMethod, setCalcMethodState] = useState(() => {
+    try {
+      const saved = parseInt(localStorage.getItem(METHOD_STORAGE_KEY) || '', 10);
+      if (CALCULATION_METHODS.some((m) => m.id === saved)) return saved;
+    } catch {
+      // ignore
+    }
+    return 21; // Default to Morocco (Habous)
+  });
+
+  const [alertsEnabled, setAlertsEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(ALERTS_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [alertPermission, setAlertPermission] = useState(() => {
+    if (typeof Notification === 'undefined') return 'unsupported';
+    return Notification.permission;
+  });
+
+  const setCalcMethod = useCallback((methodId) => {
+    const id = Number(methodId);
+    setCalcMethodState(id);
+    try {
+      localStorage.setItem(METHOD_STORAGE_KEY, String(id));
+    } catch {
+      // ignore
+    }
   }, []);
 
+  const toggleAlerts = useCallback(async () => {
+    if (alertsEnabled) {
+      setAlertsEnabled(false);
+      try {
+        localStorage.setItem(ALERTS_STORAGE_KEY, 'false');
+      } catch {
+        // ignore
+      }
+      return 'disabled';
+    }
+
+    let perm = typeof Notification === 'undefined' ? 'unsupported' : Notification.permission;
+    if (typeof Notification !== 'undefined' && perm === 'default') {
+      try {
+        perm = await Notification.requestPermission();
+      } catch {
+        perm = 'denied';
+      }
+    }
+    setAlertPermission(perm);
+
+    // Enable in-app chime even if Notification permission is unsupported or denied;
+    // UI surfaces permission state clearly when denied.
+    setAlertsEnabled(true);
+    try {
+      localStorage.setItem(ALERTS_STORAGE_KEY, 'true');
+    } catch {
+      // ignore
+    }
+    if (onPrayerArrive) onPrayerArrive();
+    return perm;
+  }, [alertsEnabled, onPrayerArrive]);
+
+  // Tick clock every 15 seconds in target location timezone
+  useEffect(() => {
+    setNowMins(getNowMinutes(timezone));
+    const timer = setInterval(() => {
+      setNowMins(getNowMinutes(timezone));
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [timezone]);
+
   const fetchPrayers = useCallback(async () => {
-    if (!lat || !lon) return;
+    if (lat === undefined || lat === null || lon === undefined || lon === null) return;
     setLoading(true);
     setError(null);
 
@@ -50,6 +125,10 @@ export const usePrayerTimes = (lat, lon, lang = 'en') => {
         Isha: raw.Isha,
       });
 
+      const tz = data.data.meta?.timezone || null;
+      setTimezone(tz);
+      setNowMins(getNowMinutes(tz));
+
       // Hijri Date Formatting based on active language
       const h = data.data.date.hijri;
       const hijriMonth = lang === 'en' ? (h.month.en || h.month.ar) : h.month.ar;
@@ -66,6 +145,39 @@ export const usePrayerTimes = (lat, lon, lang = 'en') => {
     fetchPrayers();
   }, [fetchPrayers]);
 
+  // Trigger prayer chime & browser notification once when a prayer minute arrives
+  useEffect(() => {
+    if (!alertsEnabled || !prayers) return;
+    const dateKey = getDateKeyInTimeZone(timezone);
+    const prayerT = TRANSLATIONS[lang]?.prayer || TRANSLATIONS.en.prayer;
+
+    for (const key of ALERT_PRAYER_KEYS) {
+      const pTime = prayers[key];
+      if (!pTime) continue;
+      if (toMinutes(pTime) === nowMins) {
+        const alertId = `${dateKey}-${key}`;
+        if (firedAlertsRef.current.has(alertId)) continue;
+        firedAlertsRef.current.add(alertId);
+
+        if (onPrayerArrive) onPrayerArrive();
+
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          const prayerName = prayerT[key.toLowerCase()] || key;
+          const body = (prayerT.athanArrived || 'Time for {prayer}').replace('{prayer}', prayerName);
+          try {
+            new Notification('Mizaji | مزاجي', {
+              body,
+              icon: '/icon-192.png',
+              tag: alertId,
+            });
+          } catch {
+            // Ignore notification errors in restricted contexts
+          }
+        }
+      }
+    }
+  }, [alertsEnabled, prayers, nowMins, timezone, lang, onPrayerArrive]);
+
   // Next prayer computation with rollover
   const nextPrayerInfo = useMemo(() => {
     return calculateNextPrayer(prayers, nowMins);
@@ -79,12 +191,16 @@ export const usePrayerTimes = (lat, lon, lang = 'en') => {
   return {
     prayers,
     hijri,
+    nowMins,
     nextPrayerInfo,
     qiblaAngle,
     loading,
     error,
     calcMethod,
     setCalcMethod,
+    alertsEnabled,
+    alertPermission,
+    toggleAlerts,
     refreshPrayers: fetchPrayers,
   };
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, MapPin, Navigation, Loader2, Building2 } from 'lucide-react';
+import { Search, X, MapPin, Navigation, Loader2, Building2, Star, History } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
 
 export const LocationSearchModal = ({
@@ -11,6 +11,10 @@ export const LocationSearchModal = ({
   searchResults,
   isSearching,
   popularCities,
+  favorites = [],
+  recentCities = [],
+  onToggleFavorite,
+  isFavorite,
   lang,
   isDarkMode,
 }) => {
@@ -18,15 +22,86 @@ export const LocationSearchModal = ({
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   useEffect(() => {
+    if (query.trim().length < 2) {
+      onSearch('');
+      return undefined;
+    }
     const timer = setTimeout(() => {
-      if (query.trim().length >= 2) {
-        onSearch(query);
-      }
+      onSearch(query);
     }, 350);
     return () => clearTimeout(timer);
   }, [query, onSearch]);
 
   if (!isOpen) return null;
+
+  const getCityLabel = (c) => {
+    if (lang === 'ar') return c.nameAr || c.name;
+    if (lang === 'ma') return c.nameMa || c.nameAr || c.name;
+    return c.name;
+  };
+
+  const getCountryLabel = (c) => (lang === 'en' ? c.country : (c.countryAr || c.country));
+
+  const renderCityGridSection = (title, cities, iconNode) => {
+    if (!cities || cities.length === 0) return null;
+    return (
+      <div className="mb-4 last:mb-0">
+        <div className={`flex items-center gap-1.5 text-[11px] font-bold px-1 mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+          {iconNode}
+          <span>{title}</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {cities.map((c) => {
+            const starred = isFavorite ? isFavorite(c) : false;
+            return (
+              <div
+                key={`${c.name}-${c.lat}-${c.lon}`}
+                className={`
+                  p-2.5 rounded-2xl flex items-center justify-between gap-1.5 transition-all
+                  ${isDarkMode 
+                    ? 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80' 
+                    : 'bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200'
+                  }
+                `}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectCity(c);
+                    onClose();
+                  }}
+                  className="flex items-center gap-2 min-w-0 flex-1 text-start"
+                >
+                  <MapPin size={14} className="text-amber-500 flex-shrink-0" />
+                  <div className="truncate">
+                    <p className={`text-xs font-extrabold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                      {getCityLabel(c)}
+                    </p>
+                    <p className={`text-[10px] font-medium truncate ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                      {getCountryLabel(c)}
+                    </p>
+                  </div>
+                </button>
+                {onToggleFavorite && (
+                  <button
+                    type="button"
+                    aria-label="Toggle Favorite"
+                    onClick={() => onToggleFavorite(c)}
+                    className="p-1 rounded-full hover:bg-amber-500/15 transition-colors flex-shrink-0"
+                  >
+                    <Star
+                      size={14}
+                      className={starred ? 'fill-amber-400 text-amber-400' : 'opacity-40 hover:opacity-80'}
+                    />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 sm:pt-20 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
@@ -105,34 +180,56 @@ export const LocationSearchModal = ({
               <span className="text-[11px] font-bold opacity-50 px-1 mb-1">
                 {lang === 'en' ? 'Search Results' : 'نتائج البحث'}
               </span>
-              {searchResults.map((city, idx) => (
-                <button
-                  key={`${city.name}-${idx}`}
-                  onClick={() => {
-                    onSelectCity(city);
-                    onClose();
-                  }}
-                  className={`
-                    w-full p-3 rounded-2xl flex items-center justify-between text-left transition-colors
-                    ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}
-                  `}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
-                      <Building2 size={16} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">{city.name}</p>
-                      <p className="text-[11px] opacity-60 font-medium">
-                        {[city.admin1, city.country].filter(Boolean).join(', ')}
-                      </p>
+              {searchResults.map((city, idx) => {
+                const starred = isFavorite ? isFavorite(city) : false;
+                return (
+                  <div
+                    key={`${city.name}-${idx}`}
+                    className={`
+                      w-full p-2.5 rounded-2xl flex items-center justify-between gap-2 transition-colors
+                      ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}
+                    `}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectCity(city);
+                        onClose();
+                      }}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-start"
+                    >
+                      <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 flex-shrink-0">
+                        <Building2 size={16} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{city.name}</p>
+                        <p className="text-[11px] opacity-60 font-medium truncate">
+                          {[city.admin1, city.country].filter(Boolean).join(', ')}
+                        </p>
+                      </div>
+                    </button>
+
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs opacity-40 font-mono">
+                        {city.lat.toFixed(2)}°, {city.lon.toFixed(2)}°
+                      </span>
+                      {onToggleFavorite && (
+                        <button
+                          type="button"
+                          aria-label="Toggle Favorite"
+                          onClick={() => onToggleFavorite(city)}
+                          className="p-1.5 rounded-full hover:bg-amber-500/15 transition-colors"
+                        >
+                          <Star
+                            size={15}
+                            className={starred ? 'fill-amber-400 text-amber-400' : 'opacity-40 hover:opacity-80'}
+                          />
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <span className="text-xs opacity-40 font-mono">
-                    {city.lat.toFixed(2)}°, {city.lon.toFixed(2)}°
-                  </span>
-                </button>
-              ))}
+                );
+              })}
             </div>
           ) : query.trim().length >= 2 && !isSearching ? (
             <div className="py-8 text-center opacity-50 text-xs font-semibold">
@@ -140,37 +237,9 @@ export const LocationSearchModal = ({
             </div>
           ) : (
             <div>
-              <span className={`text-[11px] font-bold px-1 block mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                {t.popularCities}
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {popularCities.map((c) => (
-                  <button
-                    key={c.name}
-                    onClick={() => {
-                      onSelectCity(c);
-                      onClose();
-                    }}
-                    className={`
-                      p-3 rounded-2xl flex items-center gap-2.5 transition-all text-left
-                      ${isDarkMode 
-                        ? 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80' 
-                        : 'bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200'
-                      }
-                    `}
-                  >
-                    <MapPin size={14} className="text-amber-500 flex-shrink-0" />
-                    <div className="truncate">
-                      <p className={`text-xs font-extrabold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                        {lang === 'ar' ? c.nameAr : lang === 'ma' ? c.nameMa : c.name}
-                      </p>
-                      <p className={`text-[10px] font-medium truncate ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                        {lang === 'en' ? c.country : c.countryAr}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {renderCityGridSection(t.favorites, favorites, <Star size={12} className="fill-amber-400 text-amber-400" />)}
+              {renderCityGridSection(t.recentCities, recentCities, <History size={12} className="text-blue-400" />)}
+              {renderCityGridSection(t.popularCities, popularCities, <MapPin size={12} className="text-amber-500" />)}
             </div>
           )}
         </div>

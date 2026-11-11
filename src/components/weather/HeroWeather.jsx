@@ -4,6 +4,7 @@ import {
   Meh, 
   Flame, 
   Glasses, 
+  Shirt,
   Copy, 
   Check, 
   Dices,
@@ -12,6 +13,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
+import { convertTemp, convertTempDiff, getOutfitAdvice } from '../../utils/weatherHelpers';
 
 export const HeroWeather = ({
   mood,
@@ -20,6 +22,7 @@ export const HeroWeather = ({
   onChangePersonality,
   onShuffleRoast,
   lang,
+  unit = 'metric',
   isDarkMode,
   onTapEffect,
 }) => {
@@ -47,7 +50,7 @@ export const HeroWeather = ({
     if (!activeData || activeData.tempDiffFromYesterday === undefined || !activeData.isToday) {
       return null;
     }
-    const diff = activeData.tempDiffFromYesterday;
+    const diff = Math.round(convertTempDiff(activeData.tempDiffFromYesterday, unit));
     const m = t.memory;
     if (!m) return null;
 
@@ -63,6 +66,8 @@ export const HeroWeather = ({
   };
 
   const memoryMessage = getMemoryText();
+  const outfitAdvice = getOutfitAdvice(activeData, mood.type, lang, personality);
+  const tempUnitLabel = unit === 'imperial' ? '°F' : '°C';
 
   return (
     <div className="relative z-10 w-full flex flex-col items-center pt-2 pb-4">
@@ -150,10 +155,10 @@ export const HeroWeather = ({
               }
             `}
           >
-            {Math.round(activeData.temp)}
+            {Math.round(convertTemp(activeData.temp, unit))}
           </span>
           <span className={`text-4xl font-light mt-1 ${isRoast ? 'text-red-400' : mood.text}`}>
-            °C
+            {tempUnitLabel}
           </span>
         </div>
 
@@ -161,14 +166,14 @@ export const HeroWeather = ({
         <div className={`flex items-center gap-3 mt-2 text-xs font-extrabold ${isRoast ? 'text-red-200' : isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>
           <div className="flex items-center gap-0.5">
             <ArrowUp size={13} className="text-rose-500 font-black" />
-            <span>{Math.round(activeData.tempMax)}°</span>
+            <span>{Math.round(convertTemp(activeData.tempMax, unit))}°</span>
           </div>
           <div className="flex items-center gap-0.5">
             <ArrowDown size={13} className="text-sky-400 font-black" />
-            <span>{Math.round(activeData.tempMin)}°</span>
+            <span>{Math.round(convertTemp(activeData.tempMin, unit))}°</span>
           </div>
           <span className="opacity-40">•</span>
-          <span className="font-semibold">{t.feelsLike}: {Math.round(activeData.feelsLike)}°</span>
+          <span className="font-semibold">{t.feelsLike}: {Math.round(convertTemp(activeData.feelsLike, unit))}°</span>
         </div>
 
         {/* Memory comparison line */}
@@ -206,6 +211,14 @@ export const HeroWeather = ({
             <Glasses size={14} className={isRoast ? 'text-red-400' : mood.text} />
             <span>{mood.advice}</span>
           </div>
+
+          {/* Persona-matched Outfit Check */}
+          {outfitAdvice && (
+            <div className={`mt-2.5 pt-2.5 border-t flex items-center justify-center gap-1.5 text-xs font-semibold ${isRoast ? 'border-red-900/40 text-red-200' : isDarkMode ? 'border-slate-800 text-slate-300' : 'border-slate-200/80 text-slate-700'}`}>
+              <Shirt size={14} className={`flex-shrink-0 ${isRoast ? 'text-red-400' : mood.text}`} />
+              <span>{outfitAdvice}</span>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons: Shuffle Roast & Copy Excuse */}

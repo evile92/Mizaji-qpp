@@ -2,6 +2,14 @@
 const KAABA_LAT = 21.422487;
 const KAABA_LON = 39.826206;
 
+// Supported Aladhan calculation methods (single source of truth for UI and hook)
+export const CALCULATION_METHODS = [
+  { id: 21, key: 'habous' },
+  { id: 3, key: 'mwl' },
+  { id: 4, key: 'makkah' },
+  { id: 5, key: 'egypt' },
+];
+
 // Convert "HH:MM" (e.g. "05:42") to minutes since midnight
 export const toMinutes = (timeStr) => {
   if (!timeStr || typeof timeStr !== 'string') return 0;
@@ -12,10 +20,52 @@ export const toMinutes = (timeStr) => {
   return h * 60 + m;
 };
 
-// Current local time in minutes since midnight
-export const getNowMinutes = () => {
+/**
+ * Current time in minutes since midnight for an optional IANA timezone.
+ */
+export const getNowMinutes = (timeZone) => {
   const d = new Date();
+  if (timeZone) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).formatToParts(d);
+      const h = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '', 10);
+      const m = parseInt(parts.find((p) => p.type === 'minute')?.value ?? '', 10);
+      if (!Number.isNaN(h) && !Number.isNaN(m)) {
+        return (h % 24) * 60 + m;
+      }
+    } catch {
+      // Fallback to local clock if timezone is unsupported
+    }
+  }
   return d.getHours() * 60 + d.getMinutes();
+};
+
+/**
+ * Current YYYY-MM-DD key in the target timezone (or browser local clock).
+ */
+export const getDateKeyInTimeZone = (timeZone) => {
+  const d = new Date();
+  if (timeZone) {
+    try {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(d);
+    } catch {
+      // Fallback to local date
+    }
+  }
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 };
 
 // Format "HH:MM" (24h) -> 12h for EN with AM/PM, 24h for AR/MA
