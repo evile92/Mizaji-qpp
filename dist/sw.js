@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mizaji-pwa-v2';
+const CACHE_NAME = 'mizaji-pwa-v3';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -60,6 +60,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // HTML navigation requests -> Network first so new deployments never serve stale index.html hashes
+  const isHtmlNavigation =
+    event.request.mode === 'navigate' ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('.html') ||
+    event.request.headers.get('accept')?.includes('text/html');
+
+  if (isHtmlNavigation) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/index.html')))
+    );
+    return;
+  }
+
   // Static assets -> Cache first, fallback to network
   event.respondWith(
     caches.match(event.request).then((cached) => {
@@ -70,10 +92,6 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return networkResponse;
-      }).catch(() => {
-        if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('/index.html');
-        }
       });
     })
   );
