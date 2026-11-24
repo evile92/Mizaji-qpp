@@ -127,7 +127,7 @@ export const formatCountdown = (minutes, lang = 'en') => {
     if (h === 0) return `${m}m`;
     return `${h}h ${m}m`;
   }
-  if (lang === 'ar' || lang === 'ma') {
+  if (lang === 'ar') {
     if (h === 0) return `${m} دقيقة`;
     return `${h} س و ${m} د`;
   }

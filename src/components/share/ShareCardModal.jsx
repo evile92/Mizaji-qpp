@@ -115,7 +115,7 @@ export const ShareCardModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
       <div className="w-full max-w-sm flex flex-col items-center">
         {/* Top Close */}
         <div className="w-full flex items-center justify-between mb-3 text-white">
@@ -241,17 +241,17 @@ export const ShareCardModal = ({
           <button
             onClick={() => handleCapture('share')}
             disabled={capturing}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white text-slate-900 font-extrabold text-xs shadow-lg hover:bg-white/90 transition-all disabled:opacity-50 active:scale-95"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white text-slate-900 font-extrabold text-xs shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 active:scale-95"
           >
             {capturing ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={16} />}
-            <span>{lang === 'ma' ? 'بارطاجي' : lang === 'ar' ? 'مشاركة' : 'Share'}</span>
+            <span>{lang === 'ar' ? 'مشاركة' : 'Share'}</span>
           </button>
 
           <button
             onClick={() => handleCapture('download')}
             disabled={capturing}
             aria-label="Download PNG"
-            className="p-3 rounded-2xl bg-white/20 text-white font-bold text-xs hover:bg-white/30 transition-all disabled:opacity-50 active:scale-95"
+            className="p-3 rounded-2xl bg-white/20 text-white font-bold text-xs hover:bg-white/30 transition-colors disabled:opacity-50 active:scale-95"
           >
             <Download size={16} />
           </button>
@@ -260,7 +260,7 @@ export const ShareCardModal = ({
             onClick={() => handleCapture('copy')}
             disabled={capturing}
             aria-label="Copy to Clipboard"
-            className="p-3 rounded-2xl bg-white/20 text-white font-bold text-xs hover:bg-white/30 transition-all disabled:opacity-50 active:scale-95"
+            className="p-3 rounded-2xl bg-white/20 text-white font-bold text-xs hover:bg-white/30 transition-colors disabled:opacity-50 active:scale-95"
           >
             {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
           </button>

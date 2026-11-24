@@ -11,8 +11,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Cairo', 'sans-serif'],
-        arabic: ['Cairo', 'Tajawal', 'sans-serif'],
-        heading: ['Tajawal', '"Plus Jakarta Sans"', 'sans-serif'],
+        arabic: ['Cairo', 'sans-serif'],
+        heading: ['Cairo', '"Plus Jakarta Sans"', 'sans-serif'],
       },
       colors: {
         slate: {
@@ -25,7 +25,6 @@ export default {
         'bounce-slow': 'bounce-subtle 3s ease-in-out infinite',
         'float': 'float 6s ease-in-out infinite',
         'float-delayed': 'float 6s ease-in-out 2s infinite',
-        'rain': 'rain 0.6s linear infinite',
         'flash': 'flash 5s linear infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'spin-slow': 'spin 12s linear infinite',
@@ -38,10 +37,6 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-12px)' },
-        },
-        rain: {
-          '0%': { backgroundPosition: '0 0' },
-          '100%': { backgroundPosition: '15px 120px' },
         },
         flash: {
           '0%, 88%, 100%': { opacity: '0.05' },

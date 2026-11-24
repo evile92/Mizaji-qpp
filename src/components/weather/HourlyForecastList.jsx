@@ -3,7 +3,7 @@ import { Droplets, Clock } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
 import { getWeatherIcon, convertTemp } from '../../utils/weatherHelpers';
 
-export const HourlyForecastList = ({
+export const HourlyForecastList = React.memo(({
   hourlyData,
   isToday,
   lang,
@@ -58,7 +58,7 @@ export const HourlyForecastList = ({
 
           // Time string
           const displayTime = isNow 
-            ? (lang === 'ma' ? 'دبا' : lang === 'ar' ? 'الآن' : 'Now')
+            ? (lang === 'ar' ? 'الآن' : 'Now')
             : `${item.hour}:00`;
 
           return (
@@ -67,19 +67,19 @@ export const HourlyForecastList = ({
               ref={isNow ? currentHourRef : null}
               className={`
                 snap-center flex-shrink-0 flex flex-col items-center justify-between py-3.5 px-3.5 rounded-3xl
-                transition-all duration-300 min-w-[72px] backdrop-blur-xl border
+                transition-colors duration-200 min-w-[72px] border
                 ${isNow
                   ? (isRoast
-                      ? 'bg-red-600 text-white border-red-400 shadow-xl shadow-red-600/40 ring-2 ring-red-400 scale-105'
+                      ? 'bg-red-600 text-white border-red-400 shadow-lg shadow-red-600/40 ring-2 ring-red-400'
                       : isDarkMode
-                        ? 'bg-slate-700 text-white border-slate-500 shadow-xl shadow-black/30 ring-2 ring-slate-400 scale-105'
-                        : 'bg-slate-800 text-white border-slate-700 shadow-xl shadow-slate-900/30 ring-2 ring-slate-700 scale-105'
+                        ? 'bg-slate-700 text-white border-slate-500 shadow-lg shadow-black/30 ring-2 ring-slate-400'
+                        : 'bg-slate-800 text-white border-slate-700 shadow-lg shadow-slate-900/30 ring-2 ring-slate-700'
                     )
                   : (isRoast
-                      ? 'bg-red-950/20 border-red-900/30 text-red-200 hover:bg-red-900/30'
+                      ? 'bg-red-950/60 border-red-900/40 text-red-200 hover:bg-red-900/60'
                       : isDarkMode
-                        ? 'bg-slate-900/50 border-slate-800/70 text-slate-200 hover:bg-slate-850'
-                        : 'bg-white/60 border-white/60 text-slate-800 hover:bg-white/80 shadow-sm'
+                        ? 'bg-slate-900/80 border-slate-800/80 text-slate-200 hover:bg-slate-850'
+                        : 'bg-white/85 border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
                     )
                 }
               `}
@@ -114,4 +114,4 @@ export const HourlyForecastList = ({
       </div>
     </div>
   );
-};
+});

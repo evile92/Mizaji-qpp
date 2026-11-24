@@ -35,9 +35,7 @@ export const LocationSearchModal = ({
   if (!isOpen) return null;
 
   const getCityLabel = (c) => {
-    if (lang === 'ar') return c.nameAr || c.name;
-    if (lang === 'ma') return c.nameMa || c.nameAr || c.name;
-    return c.name;
+    return lang === 'ar' ? (c.nameAr || c.name) : c.name;
   };
 
   const getCountryLabel = (c) => (lang === 'en' ? c.country : (c.countryAr || c.country));
@@ -57,7 +55,7 @@ export const LocationSearchModal = ({
               <div
                 key={`${c.name}-${c.lat}-${c.lon}`}
                 className={`
-                  p-2.5 rounded-2xl flex items-center justify-between gap-1.5 transition-all
+                  p-2.5 rounded-2xl flex items-center justify-between gap-1.5 transition-colors
                   ${isDarkMode 
                     ? 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80' 
                     : 'bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200'
@@ -104,11 +102,11 @@ export const LocationSearchModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 sm:pt-20 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 sm:pt-20 bg-black/70 animate-in fade-in duration-200">
       <div 
         className={`
-          w-full max-w-lg rounded-3xl p-5 shadow-2xl border flex flex-col max-h-[85vh] transition-all
-          ${isDarkMode ? 'bg-slate-900/95 border-slate-800 text-white' : 'bg-white/95 border-slate-200 text-slate-900'}
+          w-full max-w-lg rounded-3xl p-5 shadow-2xl border flex flex-col max-h-[85vh] transition-colors
+          ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}
         `}
       >
         {/* Header */}
@@ -136,7 +134,7 @@ export const LocationSearchModal = ({
             placeholder={t.searchPlaceholder}
             autoFocus
             className={`
-              w-full pl-10 pr-10 py-3 rounded-2xl text-sm font-semibold outline-none border transition-all
+              w-full pl-10 pr-10 py-3 rounded-2xl text-sm font-semibold outline-none border transition-colors
               ${isDarkMode 
                 ? 'bg-slate-800/80 border-slate-700 focus:border-blue-500 text-white placeholder-slate-500' 
                 : 'bg-slate-100 border-slate-200 focus:border-blue-500 text-slate-900 placeholder-slate-400'
@@ -162,7 +160,7 @@ export const LocationSearchModal = ({
             onClose();
           }}
           className={`
-            mt-3 flex items-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold transition-all
+            mt-3 flex items-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold transition-colors
             ${isDarkMode 
               ? 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30' 
               : 'bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200'

@@ -15,7 +15,7 @@ import {
 import { TRANSLATIONS } from '../../constants/translations';
 import { convertTemp, convertTempDiff, getOutfitAdvice } from '../../utils/weatherHelpers';
 
-export const HeroWeather = ({
+export const HeroWeather = React.memo(({
   mood,
   activeData,
   personality,
@@ -74,12 +74,12 @@ export const HeroWeather = ({
       {/* Personality Pill Switcher */}
       <div 
         className={`
-          flex items-center p-1 rounded-full border mb-5 max-w-xs w-full backdrop-blur-xl transition-all duration-300
+          flex items-center p-1 rounded-full border mb-5 max-w-xs w-full transition-colors duration-200
           ${isRoast 
-            ? 'bg-red-950/40 border-red-800/40 shadow-lg shadow-red-950/30' 
+            ? 'bg-red-950/80 border-red-800/50 shadow-lg shadow-red-950/30' 
             : isDarkMode 
-              ? 'bg-slate-900/60 border-slate-700/50 shadow-lg shadow-black/20' 
-              : 'bg-white/60 border-white/60 shadow-sm'
+              ? 'bg-slate-900/85 border-slate-700/60 shadow-lg shadow-black/20' 
+              : 'bg-white/90 border-slate-200/80 shadow-sm'
           }
         `}
       >
@@ -91,49 +91,46 @@ export const HeroWeather = ({
               key={p.id}
               onClick={() => onChangePersonality(p.id)}
               className={`
-                flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-extrabold transition-all duration-300
+                flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-extrabold transition-colors duration-200
                 ${isActive
                   ? (p.id === 'roast'
-                      ? 'bg-red-600 text-white shadow-md shadow-red-600/40 scale-102'
-                      : isDarkMode
-                        ? 'bg-slate-800 text-white shadow-md'
-                        : 'bg-slate-800 text-white shadow-sm'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-600/40'
+                      : 'bg-slate-800 text-white shadow-sm'
                     )
                   : (isDarkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-900')
                 }
               `}
             >
-              <PIcon size={14} className={isActive && p.id === 'roast' ? 'animate-bounce' : ''} />
+              <PIcon size={14} />
               <span>{p.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Main Weather Animated Orb & Condition Label */}
+      {/* Main Weather Orb & Condition Label */}
       <div className="relative mb-3 flex flex-col items-center">
         <div 
           className={`
             w-32 h-32 rounded-3xl flex items-center justify-center bg-gradient-to-br ${mood.gradient} 
-            ${mood.glow} animate-bounce-slow relative overflow-hidden transition-all duration-500 shadow-2xl
+            ${mood.glow} relative overflow-hidden transition-colors duration-300 shadow-xl
           `}
         >
           <Icon className="w-16 h-16 text-white drop-shadow-lg relative z-10" />
           {isRoast && (
-            <div className="absolute inset-0 bg-red-600/30 mix-blend-color-dodge animate-pulse"></div>
+            <div className="absolute inset-0 bg-red-600/25"></div>
           )}
-          <div className="absolute -inset-1 bg-white/20 blur-sm rounded-3xl -z-0"></div>
         </div>
 
         {/* Condition Badge */}
         <div 
           className={`
-            -mt-3.5 px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider backdrop-blur-xl border shadow-md transition-all
+            -mt-3.5 px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-md transition-colors
             ${isRoast 
               ? 'bg-red-600 text-white border-red-500' 
               : isDarkMode 
-                ? 'bg-slate-800/90 text-slate-100 border-slate-700' 
-                : 'bg-white/90 text-slate-800 border-white'
+                ? 'bg-slate-800 text-slate-100 border-slate-700' 
+                : 'bg-white text-slate-800 border-slate-200'
             }
           `}
         >
@@ -188,12 +185,12 @@ export const HeroWeather = ({
       <div className="w-full max-w-md px-2 mt-4 flex flex-col items-center gap-3">
         <div 
           className={`
-            w-full p-4 rounded-3xl backdrop-blur-xl border transition-all duration-300 relative text-center
+            w-full p-4 rounded-3xl border transition-colors duration-200 relative text-center
             ${isRoast
-              ? 'bg-red-950/30 border-red-900/40 shadow-lg shadow-red-950/20'
+              ? 'bg-red-950/75 border-red-900/50 shadow-lg shadow-red-950/20'
               : isDarkMode
-                ? 'bg-slate-900/60 border-slate-800 shadow-md'
-                : 'bg-white/60 border-white/60 shadow-sm'
+                ? 'bg-slate-900/85 border-slate-800 shadow-md'
+                : 'bg-white/90 border-slate-200/80 shadow-sm'
             }
           `}
         >
@@ -228,12 +225,12 @@ export const HeroWeather = ({
             onClick={onShuffleRoast}
             aria-label="Shuffle Roast"
             className={`
-              flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95
+              flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition-transform active:scale-95
               ${isRoast 
-                ? 'bg-red-900/40 hover:bg-red-800/50 text-red-200 border border-red-800/40' 
+                ? 'bg-red-900/70 hover:bg-red-800/80 text-red-100 border border-red-800/50' 
                 : isDarkMode 
-                  ? 'bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 border border-slate-700' 
-                  : 'bg-white/70 hover:bg-white text-slate-700 border border-white/60 shadow-sm'
+                  ? 'bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700' 
+                  : 'bg-white/90 hover:bg-white text-slate-700 border border-slate-200 shadow-sm'
               }
             `}
           >
@@ -246,7 +243,7 @@ export const HeroWeather = ({
             onClick={handleCopyExcuse}
             aria-label="Copy Absence Excuse"
             className={`
-              flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-extrabold uppercase tracking-wide transition-all active:scale-95
+              flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-extrabold uppercase tracking-wide transition-transform active:scale-95
               ${copied
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
                 : isRoast
@@ -264,4 +261,4 @@ export const HeroWeather = ({
       </div>
     </div>
   );
-};
+});

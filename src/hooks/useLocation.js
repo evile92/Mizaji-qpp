@@ -3,20 +3,20 @@ import { TRANSLATIONS } from '../constants/translations';
 
 // Popular Moroccan & International city presets
 export const POPULAR_CITIES = [
-  { name: 'Tetouan', nameAr: 'تطوان', nameMa: 'تطوان', country: 'Morocco', countryAr: 'المغرب', lat: 35.5785, lon: -5.3684 },
-  { name: 'Tangier', nameAr: 'طنجة', nameMa: 'طنجة', country: 'Morocco', countryAr: 'المغرب', lat: 35.7595, lon: -5.8340 },
-  { name: 'Casablanca', nameAr: 'الدار البيضاء', nameMa: 'كازا', country: 'Morocco', countryAr: 'المغرب', lat: 33.5731, lon: -7.5898 },
-  { name: 'Rabat', nameAr: 'الرباط', nameMa: 'الرباط', country: 'Morocco', countryAr: 'المغرب', lat: 34.0209, lon: -6.8416 },
-  { name: 'Marrakech', nameAr: 'مراكش', nameMa: 'مراكش', country: 'Morocco', countryAr: 'المغرب', lat: 31.6295, lon: -7.9811 },
-  { name: 'Fez', nameAr: 'فاس', nameMa: 'فاس', country: 'Morocco', countryAr: 'المغرب', lat: 34.0181, lon: -5.0078 },
-  { name: 'Agadir', nameAr: 'أكادير', nameMa: 'أكادير', country: 'Morocco', countryAr: 'المغرب', lat: 30.4278, lon: -9.5981 },
-  { name: 'Oujda', nameAr: 'وجدة', nameMa: 'وجدة', country: 'Morocco', countryAr: 'المغرب', lat: 34.6867, lon: -1.9114 },
-  { name: 'Riyadh', nameAr: 'الرياض', nameMa: 'الرياض', country: 'Saudi Arabia', countryAr: 'السعودية', lat: 24.7136, lon: 46.6753 },
-  { name: 'Cairo', nameAr: 'القاهرة', nameMa: 'القاهرة', country: 'Egypt', countryAr: 'مصر', lat: 30.0444, lon: 31.2357 },
-  { name: 'Dubai', nameAr: 'دبي', nameMa: 'دبي', country: 'UAE', countryAr: 'الإمارات', lat: 25.2048, lon: 55.2708 },
-  { name: 'Paris', nameAr: 'باريس', nameMa: 'باريس', country: 'France', countryAr: 'فرنسا', lat: 48.8566, lon: 2.3522 },
-  { name: 'Madrid', nameAr: 'مدريد', nameMa: 'مدريد', country: 'Spain', countryAr: 'إسبانيا', lat: 40.4168, lon: -3.7038 },
-  { name: 'London', nameAr: 'لندن', nameMa: 'لندن', country: 'UK', countryAr: 'بريطانيا', lat: 51.5074, lon: -0.1278 },
+  { name: 'Tetouan', nameAr: 'تطوان', country: 'Morocco', countryAr: 'المغرب', lat: 35.5785, lon: -5.3684 },
+  { name: 'Tangier', nameAr: 'طنجة', country: 'Morocco', countryAr: 'المغرب', lat: 35.7595, lon: -5.8340 },
+  { name: 'Casablanca', nameAr: 'الدار البيضاء', country: 'Morocco', countryAr: 'المغرب', lat: 33.5731, lon: -7.5898 },
+  { name: 'Rabat', nameAr: 'الرباط', country: 'Morocco', countryAr: 'المغرب', lat: 34.0209, lon: -6.8416 },
+  { name: 'Marrakech', nameAr: 'مراكش', country: 'Morocco', countryAr: 'المغرب', lat: 31.6295, lon: -7.9811 },
+  { name: 'Fez', nameAr: 'فاس', country: 'Morocco', countryAr: 'المغرب', lat: 34.0181, lon: -5.0078 },
+  { name: 'Agadir', nameAr: 'أكادير', country: 'Morocco', countryAr: 'المغرب', lat: 30.4278, lon: -9.5981 },
+  { name: 'Oujda', nameAr: 'وجدة', country: 'Morocco', countryAr: 'المغرب', lat: 34.6867, lon: -1.9114 },
+  { name: 'Riyadh', nameAr: 'الرياض', country: 'Saudi Arabia', countryAr: 'السعودية', lat: 24.7136, lon: 46.6753 },
+  { name: 'Cairo', nameAr: 'القاهرة', country: 'Egypt', countryAr: 'مصر', lat: 30.0444, lon: 31.2357 },
+  { name: 'Dubai', nameAr: 'دبي', country: 'UAE', countryAr: 'الإمارات', lat: 25.2048, lon: 55.2708 },
+  { name: 'Paris', nameAr: 'باريس', country: 'France', countryAr: 'فرنسا', lat: 48.8566, lon: 2.3522 },
+  { name: 'Madrid', nameAr: 'مدريد', country: 'Spain', countryAr: 'إسبانيا', lat: 40.4168, lon: -3.7038 },
+  { name: 'London', nameAr: 'لندن', country: 'UK', countryAr: 'بريطانيا', lat: 51.5074, lon: -0.1278 },
 ];
 
 const DEFAULT_LOCATION = POPULAR_CITIES[0]; // Tetouan
@@ -99,7 +99,6 @@ export const useLocation = (lang = 'en') => {
         const newLoc = {
           name: geoInfo.city,
           nameAr: geoInfo.city,
-          nameMa: geoInfo.city,
           country: geoInfo.country,
           countryAr: geoInfo.country,
           lat,
@@ -178,7 +177,6 @@ export const useLocation = (lang = 'en') => {
           const mapped = data.results.map((r) => ({
             name: r.name,
             nameAr: r.name,
-            nameMa: r.name,
             country: r.country || '',
             countryAr: r.country || '',
             admin1: r.admin1 || '',
@@ -201,9 +199,7 @@ export const useLocation = (lang = 'en') => {
   // Format current location name for display in active language
   const getLocationDisplayName = () => {
     if (!location) return '';
-    if (lang === 'ar') return location.nameAr || location.name;
-    if (lang === 'ma') return location.nameMa || location.nameAr || location.name;
-    return location.name;
+    return lang === 'ar' ? (location.nameAr || location.name) : location.name;
   };
 
   return {

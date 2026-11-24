@@ -101,16 +101,16 @@ export const QiblaCompass = ({ bearingAngle, lang, isDarkMode }) => {
   return (
     <div 
       className={`
-        p-4 rounded-3xl backdrop-blur-xl border transition-all flex items-center justify-between gap-3 mt-4
+        p-4 rounded-3xl border transition-colors flex items-center justify-between gap-3 mt-4
         ${isDarkMode 
-          ? 'bg-slate-900/60 border-slate-800/80 text-white' 
-          : 'bg-white/70 border-white/70 text-slate-800 shadow-sm'
+          ? 'bg-slate-900/85 border-slate-800/80 text-white' 
+          : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-sm'
         }
       `}
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-500 flex-shrink-0">
-          <Compass size={22} className={isLive && sensorStatus === 'active' ? '' : 'animate-spin-slow'} />
+          <Compass size={22} />
         </div>
         <div className="min-w-0">
           <h4 className="text-xs font-black uppercase tracking-wider truncate">{t.qiblaTitle}</h4>
@@ -125,7 +125,7 @@ export const QiblaCompass = ({ bearingAngle, lang, isDarkMode }) => {
           type="button"
           onClick={handleToggleLive}
           className={`
-            flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-extrabold transition-all active:scale-95
+            flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-extrabold transition-colors active:scale-95
             ${isLive
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
               : isDarkMode

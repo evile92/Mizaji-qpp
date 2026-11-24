@@ -22,7 +22,7 @@ import { ShareCardModal } from './components/share/ShareCardModal';
 const App = () => {
   // ── Global Preferences ───────────────────────────────────────────────────
   const [lang, setLang] = useState(() => {
-    return localStorage.getItem('mizaji_lang') || 'ar';
+    return localStorage.getItem('mizaji_lang') === 'en' ? 'en' : 'ar';
   });
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -131,10 +131,10 @@ const App = () => {
     localStorage.setItem('mizaji_unit', unit);
   }, [unit]);
 
-  // Language toggle cycle (AR -> MA -> EN -> AR)
+  // Language toggle (AR <-> EN)
   const handleToggleLang = useCallback(() => {
     playTapSound();
-    setLang((prev) => (prev === 'ar' ? 'ma' : prev === 'ma' ? 'en' : 'ar'));
+    setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
   }, [playTapSound]);
 
   // Temperature / Wind unit toggle (°C <-> °F)
@@ -173,7 +173,35 @@ const App = () => {
     refreshPrayers();
   }, [playTapSound, refreshWeather, refreshPrayers]);
 
-  const isRtl = lang === 'ar' || lang === 'ma';
+  // Stable modal & selection callbacks for memoized child components
+  const handleOpenSearch = useCallback(() => setShowSearchModal(true), []);
+  const handleCloseSearch = useCallback(() => setShowSearchModal(false), []);
+  const handleOpenMap = useCallback(() => setShowMapModal(true), []);
+  const handleCloseMap = useCallback(() => setShowMapModal(false), []);
+  const handleOpenShare = useCallback(() => setShowShareModal(true), []);
+  const handleCloseShare = useCallback(() => setShowShareModal(false), []);
+
+  const handleSelectDay = useCallback((idx) => {
+    playTapSound();
+    setSelectedDayIndex(idx);
+  }, [playTapSound, setSelectedDayIndex]);
+
+  const handleChangeTab = useCallback((tab) => {
+    playTapSound();
+    setActiveTab(tab);
+  }, [playTapSound]);
+
+  const handleSelectCity = useCallback((city) => {
+    selectCity(city);
+    playTapSound();
+  }, [selectCity, playTapSound]);
+
+  const handleToggleFavorite = useCallback((city) => {
+    toggleFavorite(city);
+    playTapSound();
+  }, [toggleFavorite, playTapSound]);
+
+  const isRtl = lang === 'ar';
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   // Critical Error Screen
@@ -222,9 +250,9 @@ const App = () => {
         onTriggerRoast={handleTriggerRoast}
         locationDisplayName={locationDisplayName}
         isGpsActive={isGpsActive}
-        onOpenSearch={() => setShowSearchModal(true)}
-        onOpenMap={() => setShowMapModal(true)}
-        onOpenShare={() => setShowShareModal(true)}
+        onOpenSearch={handleOpenSearch}
+        onOpenMap={handleOpenMap}
+        onOpenShare={handleOpenShare}
         onRefresh={handleRefreshAll}
         isLoading={weatherLoading || prayerLoading}
       />
@@ -270,10 +298,7 @@ const App = () => {
                   <DailyForecastGrid
                     dailyData={weatherData.daily}
                     selectedDayIndex={selectedDayIndex}
-                    onSelectDay={(idx) => {
-                      playTapSound();
-                      setSelectedDayIndex(idx);
-                    }}
+                    onSelectDay={handleSelectDay}
                     lang={lang}
                     unit={unit}
                     isDarkMode={isDarkMode}
@@ -320,10 +345,7 @@ const App = () => {
       {/* Floating Bottom Navigation Bar */}
       <BottomNav
         activeTab={activeTab}
-        onChangeTab={(tab) => {
-          playTapSound();
-          setActiveTab(tab);
-        }}
+        onChangeTab={handleChangeTab}
         lang={lang}
         isDarkMode={isDarkMode}
         personality={personality}
@@ -332,11 +354,8 @@ const App = () => {
       {/* City Search Modal */}
       <LocationSearchModal
         isOpen={showSearchModal}
-        onClose={() => setShowSearchModal(false)}
-        onSelectCity={(city) => {
-          selectCity(city);
-          playTapSound();
-        }}
+        onClose={handleCloseSearch}
+        onSelectCity={handleSelectCity}
         onUseGps={detectGpsLocation}
         onSearch={searchCities}
         searchResults={searchResults}
@@ -344,10 +363,7 @@ const App = () => {
         popularCities={popularCities}
         favorites={favorites}
         recentCities={recentCities}
-        onToggleFavorite={(city) => {
-          toggleFavorite(city);
-          playTapSound();
-        }}
+        onToggleFavorite={handleToggleFavorite}
         isFavorite={isFavorite}
         lang={lang}
         isDarkMode={isDarkMode}
@@ -356,7 +372,7 @@ const App = () => {
       {/* Radar Map Modal */}
       <WeatherMapModal
         isOpen={showMapModal}
-        onClose={() => setShowMapModal(false)}
+        onClose={handleCloseMap}
         lat={location.lat}
         lon={location.lon}
         locationName={locationDisplayName}
@@ -367,7 +383,7 @@ const App = () => {
       {/* Share Card Modal */}
       <ShareCardModal
         isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
+        onClose={handleCloseShare}
         mood={currentMood}
         activeData={activeDayData}
         locationName={locationDisplayName}

@@ -26,7 +26,7 @@ export const WeatherMapModal = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 animate-in fade-in duration-200">
       <div 
         className={`
           relative w-full max-w-4xl h-[80vh] rounded-3xl overflow-hidden shadow-2xl border flex flex-col
@@ -50,7 +50,7 @@ export const WeatherMapModal = ({
                   key={l.id}
                   onClick={() => setOverlay(l.id)}
                   className={`
-                    flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all
+                    flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors
                     ${isSelected
                       ? 'bg-blue-600 text-white shadow-md'
                       : isDarkMode

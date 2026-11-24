@@ -18,7 +18,7 @@ import {
 } from '../../utils/prayerHelpers';
 import { QiblaCompass } from './QiblaCompass';
 
-export const PrayerTimesView = ({
+export const PrayerTimesView = React.memo(({
   prayers,
   hijri,
   nowMins: propNowMins,
@@ -73,10 +73,10 @@ export const PrayerTimesView = ({
         {hijri && (
           <div 
             className={`
-              flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border backdrop-blur-xl
+              flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border
               ${isDarkMode 
-                ? 'bg-slate-900/70 border-slate-800 text-amber-400' 
-                : 'bg-white/80 border-white/70 text-amber-600 shadow-sm'
+                ? 'bg-slate-900/85 border-slate-800 text-amber-400' 
+                : 'bg-white/90 border-slate-200/80 text-amber-600 shadow-sm'
               }
             `}
           >
@@ -95,7 +95,7 @@ export const PrayerTimesView = ({
       {nextKey && prayers && prayers[nextKey] && (
         <div 
           className={`
-            relative overflow-hidden rounded-3xl p-5 shadow-2xl border mb-5 transition-all
+            relative overflow-hidden rounded-3xl p-5 shadow-xl border mb-5 transition-colors
             bg-gradient-to-br ${PRAYER_META[nextKey]?.gradient || 'from-emerald-950 to-slate-900'}
             border-emerald-500/40 text-white
           `}
@@ -125,9 +125,9 @@ export const PrayerTimesView = ({
             </div>
           </div>
 
-          {/* Glowing live bar */}
+          {/* Static highlight bar */}
           <div className="w-full h-1.5 bg-black/40 rounded-full mt-4 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full animate-pulse"></div>
+            <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full"></div>
           </div>
         </div>
       )}
@@ -144,12 +144,12 @@ export const PrayerTimesView = ({
             <div
               key={key}
               className={`
-                p-4 rounded-3xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-between
+                p-4 rounded-3xl border transition-colors duration-200 flex items-center justify-between
                 ${isNext
-                  ? `bg-gradient-to-r ${meta.gradient} border-emerald-500/60 shadow-lg text-white scale-[1.02]`
+                  ? `bg-gradient-to-r ${meta.gradient} border-emerald-500/60 shadow-lg text-white`
                   : isPast
-                    ? (isDarkMode ? 'bg-slate-900/40 border-slate-800/50 text-slate-400 opacity-70' : 'bg-slate-100/60 border-slate-200 text-slate-500 opacity-70')
-                    : (isDarkMode ? 'bg-slate-900/60 border-slate-800 text-slate-100' : 'bg-white/80 border-white/70 text-slate-800 shadow-sm')
+                    ? (isDarkMode ? 'bg-slate-900/60 border-slate-800/60 text-slate-400 opacity-70' : 'bg-slate-100/80 border-slate-200 text-slate-500 opacity-70')
+                    : (isDarkMode ? 'bg-slate-900/85 border-slate-800 text-slate-100' : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-sm')
                 }
               `}
             >
@@ -179,10 +179,10 @@ export const PrayerTimesView = ({
       {/* Prayer Settings: Alerts Toggle & Calculation Method Selector */}
       <div
         className={`
-          mt-4 p-4 rounded-3xl backdrop-blur-xl border transition-all flex flex-col gap-3
+          mt-4 p-4 rounded-3xl border transition-colors flex flex-col gap-3
           ${isDarkMode
-            ? 'bg-slate-900/60 border-slate-800/80 text-white'
-            : 'bg-white/75 border-white/70 text-slate-800 shadow-sm'
+            ? 'bg-slate-900/85 border-slate-800/80 text-white'
+            : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-sm'
           }
         `}
       >
@@ -207,7 +207,7 @@ export const PrayerTimesView = ({
             onClick={onToggleAlerts}
             aria-pressed={alertsEnabled}
             className={`
-              px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all active:scale-95
+              px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-colors active:scale-95
               ${alertsEnabled
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                 : isDarkMode
@@ -253,4 +253,4 @@ export const PrayerTimesView = ({
       </div>
     </div>
   );
-};
+});

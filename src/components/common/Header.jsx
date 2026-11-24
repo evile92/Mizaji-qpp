@@ -11,7 +11,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-export const Header = ({
+export const Header = React.memo(({
   lang,
   onToggleLang,
   unit = 'metric',
@@ -33,7 +33,6 @@ export const Header = ({
   const langLabels = {
     en: 'EN',
     ar: 'عربي',
-    ma: 'دارجة',
   };
 
   return (
@@ -56,11 +55,11 @@ export const Header = ({
             onClick={onToggleLang}
             aria-label="Change Language"
             className={`
-              flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300
+              flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-colors duration-200
               ${isDarkMode 
-                ? 'bg-slate-900/60 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
-                : 'bg-white/70 border border-white/60 text-slate-800 hover:bg-white shadow-sm'
-              } backdrop-blur-xl active:scale-95
+                ? 'bg-slate-900/85 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
+                : 'bg-white/90 border border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
+              } active:scale-95
             `}
           >
             <Globe size={14} className="opacity-70" />
@@ -71,11 +70,11 @@ export const Header = ({
             onClick={onToggleUnit}
             aria-label="Toggle Temperature Unit"
             className={`
-              px-2.5 py-1.5 rounded-full text-xs font-extrabold tabular-nums transition-all duration-300
+              px-2.5 py-1.5 rounded-full text-xs font-extrabold tabular-nums transition-colors duration-200
               ${isDarkMode 
-                ? 'bg-slate-900/60 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
-                : 'bg-white/70 border border-white/60 text-slate-800 hover:bg-white shadow-sm'
-              } backdrop-blur-xl active:scale-95
+                ? 'bg-slate-900/85 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
+                : 'bg-white/90 border border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
+              } active:scale-95
             `}
           >
             {unit === 'imperial' ? '°F' : '°C'}
@@ -85,14 +84,14 @@ export const Header = ({
             onClick={onTriggerRoast}
             aria-label="Activate Roast Mode"
             className={`
-              flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black transition-all duration-300
+              flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black transition-colors duration-200
               ${isRoast
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 ring-2 ring-red-400 animate-pulse'
-                : 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:scale-105 shadow-md active:scale-95'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 ring-2 ring-red-400'
+                : 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md active:scale-95'
               }
             `}
           >
-            <Flame size={15} className={isRoast ? 'animate-bounce' : ''} />
+            <Flame size={15} />
             <span className="hidden xs:inline">ROAST</span>
           </button>
         </div>
@@ -103,11 +102,11 @@ export const Header = ({
             onClick={onOpenShare}
             aria-label="Share Weather Card"
             className={`
-              p-2 rounded-full transition-all duration-300
+              p-2 rounded-full transition-colors duration-200
               ${isDarkMode 
-                ? 'bg-slate-900/60 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
-                : 'bg-white/70 border border-white/60 text-slate-800 hover:bg-white shadow-sm'
-              } backdrop-blur-xl active:scale-90
+                ? 'bg-slate-900/85 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
+                : 'bg-white/90 border border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
+              } active:scale-90
             `}
           >
             <Share2 size={16} />
@@ -117,11 +116,11 @@ export const Header = ({
             onClick={onOpenMap}
             aria-label="Open Weather Map"
             className={`
-              p-2 rounded-full transition-all duration-300
+              p-2 rounded-full transition-colors duration-200
               ${isDarkMode 
-                ? 'bg-slate-900/60 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
-                : 'bg-white/70 border border-white/60 text-slate-800 hover:bg-white shadow-sm'
-              } backdrop-blur-xl active:scale-90
+                ? 'bg-slate-900/85 border border-slate-700/60 text-slate-200 hover:bg-slate-800' 
+                : 'bg-white/90 border border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
+              } active:scale-90
             `}
           >
             <MapIcon size={16} />
@@ -131,11 +130,11 @@ export const Header = ({
             onClick={onToggleDarkMode}
             aria-label="Toggle Dark Mode"
             className={`
-              p-2 rounded-full transition-all duration-300
+              p-2 rounded-full transition-colors duration-200
               ${isDarkMode 
-                ? 'bg-slate-900/60 border border-slate-700/60 text-amber-400 hover:bg-slate-800' 
-                : 'bg-white/70 border border-white/60 text-slate-700 hover:bg-white shadow-sm'
-              } backdrop-blur-xl active:scale-90
+                ? 'bg-slate-900/85 border border-slate-700/60 text-amber-400 hover:bg-slate-800' 
+                : 'bg-white/90 border border-slate-200/80 text-slate-700 hover:bg-white shadow-sm'
+              } active:scale-90
             `}
           >
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
@@ -148,11 +147,11 @@ export const Header = ({
         <button
           onClick={onOpenSearch}
           className={`
-            flex-1 flex items-center gap-2 px-4 py-2 rounded-2xl transition-all duration-300 text-left
+            flex-1 flex items-center gap-2 px-4 py-2 rounded-2xl transition-colors duration-200 text-left
             ${isDarkMode 
-              ? 'bg-slate-900/50 hover:bg-slate-900/80 border border-slate-800 text-slate-100' 
-              : 'bg-white/60 hover:bg-white/90 border border-white/60 text-slate-800 shadow-sm'
-            } backdrop-blur-xl group
+              ? 'bg-slate-900/80 hover:bg-slate-900 border border-slate-800 text-slate-100' 
+              : 'bg-white/90 hover:bg-white border border-slate-200/80 text-slate-800 shadow-sm'
+            } group
           `}
         >
           <div className={`p-1.5 rounded-xl ${isRoast ? 'bg-red-600/20 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
@@ -175,11 +174,11 @@ export const Header = ({
           onClick={onRefresh}
           aria-label="Refresh Weather Data"
           className={`
-            p-2.5 rounded-2xl transition-all duration-300
+            p-2.5 rounded-2xl transition-transform duration-200
             ${isDarkMode 
-              ? 'bg-slate-900/50 border border-slate-800 text-slate-300 hover:bg-slate-800' 
-              : 'bg-white/60 border border-white/60 text-slate-700 hover:bg-white shadow-sm'
-            } backdrop-blur-xl active:rotate-180
+              ? 'bg-slate-900/80 border border-slate-800 text-slate-300 hover:bg-slate-800' 
+              : 'bg-white/90 border border-slate-200/80 text-slate-700 hover:bg-white shadow-sm'
+            } active:rotate-180
           `}
         >
           <RefreshCw size={16} className={isLoading ? 'animate-spin text-blue-500' : ''} />
@@ -187,4 +186,4 @@ export const Header = ({
       </div>
     </header>
   );
-};
+});

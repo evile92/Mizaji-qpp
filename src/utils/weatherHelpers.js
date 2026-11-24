@@ -204,12 +204,9 @@ export const degreesToCompass = (degrees, lang = 'en') => {
   
   const dirsEn = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const dirsAr = ['شمال', 'ش.شرقي', 'شرق', 'ج.شرقي', 'جنوب', 'ج.غربي', 'غرب', 'ش.غربي'];
-  const dirsMa = ['الشمال', 'ش.شرق', 'الشرق', 'ج.شرق', 'الجنوب (الشرقي)', 'ج.غرب', 'الغرب', 'ش.غرب'];
 
   const index = Math.round(degrees / 45) % 8;
-  if (lang === 'ar') return dirsAr[index];
-  if (lang === 'ma') return dirsMa[index];
-  return dirsEn[index];
+  return lang === 'ar' ? dirsAr[index] : dirsEn[index];
 };
 
 // UV Index level categorization

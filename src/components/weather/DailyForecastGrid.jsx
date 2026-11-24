@@ -3,7 +3,7 @@ import { Calendar, Droplets } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
 import { getWeatherIcon, formatDate, convertTemp } from '../../utils/weatherHelpers';
 
-export const DailyForecastGrid = ({
+export const DailyForecastGrid = React.memo(({
   dailyData,
   selectedDayIndex,
   onSelectDay,
@@ -54,19 +54,19 @@ export const DailyForecastGrid = ({
               key={day.time}
               onClick={() => onSelectDay(idx)}
               className={`
-                w-full p-3.5 rounded-3xl backdrop-blur-xl border transition-all duration-300 flex items-center justify-between gap-3 text-left
+                w-full p-3.5 rounded-3xl border transition-colors duration-200 flex items-center justify-between gap-3 text-left
                 ${isSelected
                   ? (isRoast
-                      ? 'bg-red-600 text-white border-red-400 shadow-lg shadow-red-600/30 ring-2 ring-red-400 scale-[1.02]'
+                      ? 'bg-red-600 text-white border-red-400 shadow-lg shadow-red-600/30 ring-2 ring-red-400'
                       : isDarkMode
-                        ? 'bg-slate-800 text-white border-slate-600 shadow-lg shadow-black/30 ring-2 ring-slate-400 scale-[1.02]'
-                        : 'bg-white text-slate-800 border-white shadow-md ring-2 ring-slate-800/20 scale-[1.02]'
+                        ? 'bg-slate-800 text-white border-slate-600 shadow-lg shadow-black/30 ring-2 ring-slate-400'
+                        : 'bg-white text-slate-800 border-slate-200 shadow-md ring-2 ring-slate-800/20'
                     )
                   : (isRoast
-                      ? 'bg-red-950/20 border-red-900/30 text-red-200 hover:bg-red-900/30'
+                      ? 'bg-red-950/60 border-red-900/40 text-red-200 hover:bg-red-900/60'
                       : isDarkMode
-                        ? 'bg-slate-900/50 border-slate-800/70 text-slate-200 hover:bg-slate-850'
-                        : 'bg-white/60 border-white/60 text-slate-800 hover:bg-white/80 shadow-sm'
+                        ? 'bg-slate-900/80 border-slate-800/80 text-slate-200 hover:bg-slate-850'
+                        : 'bg-white/85 border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
                     )
                 }
               `}
@@ -101,7 +101,7 @@ export const DailyForecastGrid = ({
               <div className="flex-1 h-2 bg-slate-500/20 rounded-full overflow-hidden relative">
                 <div
                   className={`
-                    h-full rounded-full transition-all duration-500
+                    h-full rounded-full transition-colors duration-300
                     ${isSelected
                       ? 'bg-white'
                       : isRoast
@@ -126,4 +126,4 @@ export const DailyForecastGrid = ({
       </div>
     </div>
   );
-};
+});

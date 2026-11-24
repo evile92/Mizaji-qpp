@@ -2,7 +2,7 @@ import React from 'react';
 import { CloudSun, Moon, Map } from 'lucide-react';
 import { TRANSLATIONS } from '../../constants/translations';
 
-export const BottomNav = ({ activeTab, onChangeTab, lang, isDarkMode, personality }) => {
+export const BottomNav = React.memo(({ activeTab, onChangeTab, lang, isDarkMode, personality }) => {
   const t = TRANSLATIONS[lang]?.tabs || TRANSLATIONS.en.tabs;
   const isRoast = personality === 'roast';
 
@@ -11,12 +11,12 @@ export const BottomNav = ({ activeTab, onChangeTab, lang, isDarkMode, personalit
       <nav 
         aria-label="Bottom Navigation"
         className={`
-          pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-3xl backdrop-blur-2xl shadow-2xl border transition-all duration-300
+          pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-3xl shadow-lg border transition-colors duration-300
           ${isRoast
-            ? 'bg-[#150505]/85 border-red-900/50 shadow-red-950/40'
+            ? 'bg-[#150505]/95 border-red-900/50 shadow-red-950/40'
             : isDarkMode
-              ? 'bg-slate-900/85 border-slate-700/60 shadow-black/40'
-              : 'bg-white/85 border-white/70 shadow-slate-300/40'
+              ? 'bg-slate-900/95 border-slate-700/60 shadow-black/40'
+              : 'bg-white/95 border-slate-200/80 shadow-slate-300/40'
           }
         `}
       >
@@ -24,7 +24,7 @@ export const BottomNav = ({ activeTab, onChangeTab, lang, isDarkMode, personalit
         <button
           onClick={() => onChangeTab('weather')}
           className={`
-            relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300
+            relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-colors duration-200
             ${activeTab === 'weather'
               ? (isRoast 
                   ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
@@ -44,7 +44,7 @@ export const BottomNav = ({ activeTab, onChangeTab, lang, isDarkMode, personalit
         <button
           onClick={() => onChangeTab('prayer')}
           className={`
-            relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300
+            relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-colors duration-200
             ${activeTab === 'prayer'
               ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
               : (isDarkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-800')
@@ -57,4 +57,4 @@ export const BottomNav = ({ activeTab, onChangeTab, lang, isDarkMode, personalit
       </nav>
     </div>
   );
-};
+});

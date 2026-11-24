@@ -22,7 +22,7 @@ import {
   formatVisibility,
 } from '../../utils/weatherHelpers';
 
-export const WeatherMetricsGrid = ({ activeData, lang, unit = 'metric', isDarkMode, personality }) => {
+export const WeatherMetricsGrid = React.memo(({ activeData, lang, unit = 'metric', isDarkMode, personality }) => {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
   const isRoast = personality === 'roast';
   const uvInfo = getUVLevel(activeData?.uvIndex, lang);
@@ -126,12 +126,12 @@ export const WeatherMetricsGrid = ({ activeData, lang, unit = 'metric', isDarkMo
             <div
               key={m.id}
               className={`
-                p-3.5 rounded-3xl backdrop-blur-xl border transition-all duration-300 flex flex-col justify-between
+                p-3.5 rounded-3xl border transition-colors duration-200 flex flex-col justify-between
                 ${isRoast
-                  ? 'bg-red-950/30 border-red-900/40 text-red-100 hover:bg-red-900/30'
+                  ? 'bg-red-950/70 border-red-900/50 text-red-100 hover:bg-red-900/60'
                   : isDarkMode
-                    ? 'bg-slate-900/60 border-slate-800 text-slate-100 hover:bg-slate-850'
-                    : 'bg-white/70 border-white/60 text-slate-800 hover:bg-white/90 shadow-sm'
+                    ? 'bg-slate-900/85 border-slate-800 text-slate-100 hover:bg-slate-850'
+                    : 'bg-white/90 border-slate-200/80 text-slate-800 hover:bg-white shadow-sm'
                 }
               `}
             >
@@ -190,12 +190,12 @@ export const WeatherMetricsGrid = ({ activeData, lang, unit = 'metric', isDarkMo
       {/* Daylight Info (Sunrise & Sunset) */}
       <div 
         className={`
-          mt-2.5 p-3.5 rounded-3xl backdrop-blur-xl border flex items-center justify-around transition-all
+          mt-2.5 p-3.5 rounded-3xl border flex items-center justify-around transition-colors
           ${isRoast
-            ? 'bg-red-950/30 border-red-900/40 text-red-100'
+            ? 'bg-red-950/70 border-red-900/50 text-red-100'
             : isDarkMode
-              ? 'bg-slate-900/60 border-slate-800 text-slate-100'
-              : 'bg-white/70 border-white/60 text-slate-800 shadow-sm'
+              ? 'bg-slate-900/85 border-slate-800 text-slate-100'
+              : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-sm'
           }
         `}
       >
@@ -231,4 +231,4 @@ export const WeatherMetricsGrid = ({ activeData, lang, unit = 'metric', isDarkMo
       </div>
     </div>
   );
-};
+});

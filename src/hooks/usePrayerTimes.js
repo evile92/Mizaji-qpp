@@ -15,10 +15,10 @@ const ALERT_PRAYER_KEYS = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
 export const usePrayerTimes = (lat, lon, lang = 'en', onPrayerArrive) => {
   const [prayers, setPrayers] = useState(null);
-  const [hijri, setHijri] = useState(null);
+  const [hijriData, setHijriData] = useState(null);
   const [timezone, setTimezone] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [hasError, setHasError] = useState(false);
   const [nowMins, setNowMins] = useState(() => getNowMinutes());
   const firedAlertsRef = useRef(new Set());
 
@@ -88,11 +88,17 @@ export const usePrayerTimes = (lat, lon, lang = 'en', onPrayerArrive) => {
     return perm;
   }, [alertsEnabled, onPrayerArrive]);
 
-  // Tick clock every 15 seconds in target location timezone
+  // Tick clock every 15 seconds in target location timezone; only update state when minute changes
   useEffect(() => {
-    setNowMins(getNowMinutes(timezone));
+    setNowMins((prev) => {
+      const next = getNowMinutes(timezone);
+      return prev === next ? prev : next;
+    });
     const timer = setInterval(() => {
-      setNowMins(getNowMinutes(timezone));
+      setNowMins((prev) => {
+        const next = getNowMinutes(timezone);
+        return prev === next ? prev : next;
+      });
     }, 15000);
     return () => clearInterval(timer);
   }, [timezone]);
@@ -100,7 +106,7 @@ export const usePrayerTimes = (lat, lon, lang = 'en', onPrayerArrive) => {
   const fetchPrayers = useCallback(async () => {
     if (lat === undefined || lat === null || lon === undefined || lon === null) return;
     setLoading(true);
-    setError(null);
+    setHasError(false);
 
     try {
       const today = new Date();
@@ -129,17 +135,29 @@ export const usePrayerTimes = (lat, lon, lang = 'en', onPrayerArrive) => {
       setTimezone(tz);
       setNowMins(getNowMinutes(tz));
 
-      // Hijri Date Formatting based on active language
+      // Store raw Hijri parts so language toggle does not re-fetch API
       const h = data.data.date.hijri;
-      const hijriMonth = lang === 'en' ? (h.month.en || h.month.ar) : h.month.ar;
-      setHijri(`${h.day} ${hijriMonth} ${h.year} هـ`);
+      setHijriData({
+        day: h.day,
+        monthAr: h.month.ar,
+        monthEn: h.month.en || h.month.ar,
+        year: h.year,
+      });
     } catch (e) {
       console.error('Prayer times fetch error:', e);
-      setError(TRANSLATIONS[lang]?.fetchError || 'Failed to fetch prayer times.');
+      setHasError(true);
     } finally {
       setLoading(false);
     }
-  }, [lat, lon, calcMethod, lang]);
+  }, [lat, lon, calcMethod]);
+
+  const hijri = useMemo(() => {
+    if (!hijriData) return null;
+    const month = lang === 'en' ? hijriData.monthEn : hijriData.monthAr;
+    return `${hijriData.day} ${month} ${hijriData.year} هـ`;
+  }, [hijriData, lang]);
+
+  const error = hasError ? (TRANSLATIONS[lang]?.fetchError || 'Failed to fetch prayer times.') : null;
 
   useEffect(() => {
     fetchPrayers();

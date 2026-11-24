@@ -47,7 +47,7 @@ const mapHourlyEntry = (raw, index) => {
 export const useWeather = (lat, lon, lang = 'en', isDarkMode = false, personality = 'sarcastic') => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [hasError, setHasError] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState(2); // Index 2 is "Today"
   const [roastSeed, setRoastSeed] = useState(0);
 
@@ -58,7 +58,7 @@ export const useWeather = (lat, lon, lang = 'en', isDarkMode = false, personalit
   const fetchWeather = useCallback(async () => {
     if (lat === undefined || lat === null || lon === undefined || lon === null) return;
     setLoading(true);
-    setError(null);
+    setHasError(false);
 
     try {
       const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
@@ -136,11 +136,13 @@ export const useWeather = (lat, lon, lang = 'en', isDarkMode = false, personalit
       setSelectedDayIndex(todayIdx);
     } catch (err) {
       console.error('Weather fetch error:', err);
-      setError(TRANSLATIONS[lang]?.fetchError || 'Failed to fetch weather data.');
+      setHasError(true);
     } finally {
       setLoading(false);
     }
-  }, [lat, lon, lang]);
+  }, [lat, lon]);
+
+  const error = hasError ? (TRANSLATIONS[lang]?.fetchError || 'Failed to fetch weather data.') : null;
 
   useEffect(() => {
     fetchWeather();
