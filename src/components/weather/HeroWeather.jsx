@@ -112,11 +112,11 @@ export const HeroWeather = React.memo(({
       <div className="relative mb-3 flex flex-col items-center">
         <div 
           className={`
-            w-32 h-32 rounded-3xl flex items-center justify-center bg-gradient-to-br ${mood.gradient} 
+            w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center bg-gradient-to-br ${mood.gradient} 
             ${mood.glow} relative overflow-hidden transition-colors duration-300 shadow-xl
           `}
         >
-          <Icon className="w-16 h-16 text-white drop-shadow-lg relative z-10" />
+          <Icon className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-lg relative z-10" />
           {isRoast && (
             <div className="absolute inset-0 bg-red-600/25"></div>
           )}
@@ -125,7 +125,7 @@ export const HeroWeather = React.memo(({
         {/* Condition Badge */}
         <div 
           className={`
-            -mt-3.5 px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-md transition-colors
+            relative z-10 mt-2.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-md transition-colors
             ${isRoast 
               ? 'bg-red-600 text-white border-red-500' 
               : isDarkMode 
@@ -139,11 +139,11 @@ export const HeroWeather = React.memo(({
       </div>
 
       {/* Main Temperature Display */}
-      <div className="flex flex-col items-center mt-2">
-        <div className="flex items-start justify-center">
+      <div className="flex flex-col items-center mt-1">
+        <div dir="ltr" className="flex items-start justify-center">
           <span 
             className={`
-              text-7xl sm:text-8xl font-black tracking-tighter leading-none tabular-nums
+              text-6xl sm:text-7xl font-black tracking-tighter leading-none tabular-nums
               ${isRoast 
                 ? 'text-white drop-shadow-[0_0_25px_rgba(239,68,68,0.6)]' 
                 : isDarkMode 
@@ -154,7 +154,7 @@ export const HeroWeather = React.memo(({
           >
             {Math.round(convertTemp(activeData.temp, unit))}
           </span>
-          <span className={`text-4xl font-light mt-1 ${isRoast ? 'text-red-400' : mood.text}`}>
+          <span className={`text-2xl sm:text-3xl font-semibold mt-1 ${isRoast ? 'text-red-400' : mood.text}`}>
             {tempUnitLabel}
           </span>
         </div>

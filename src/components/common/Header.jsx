@@ -42,7 +42,7 @@ export const Header = React.memo(({
         <img
           src="/logo.png"
           alt="Mizaji"
-          className="h-11 w-auto object-contain drop-shadow-md select-none"
+          className="h-12 w-auto object-contain drop-shadow-md select-none"
           draggable="false"
         />
       </div>
